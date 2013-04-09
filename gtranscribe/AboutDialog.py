@@ -17,7 +17,7 @@
 import gtk
 import gettext
 from gettext import gettext as _
-gettext.textdomain('gtranscribe')
+gettext.textdomain('gTranscribe')
 
 class AboutDialog:
 

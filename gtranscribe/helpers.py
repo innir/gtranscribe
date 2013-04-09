@@ -21,14 +21,14 @@ import gtk
 import gio
 import gettext
 from gettext import gettext as _
-gettext.textdomain('gtranscribe')
+gettext.textdomain('gTranscribe')
 
 # Where your project will look for your data (for instance, images and ui
 # files). By default, this is ../data, relative your trunk layout
 __gtranscribe_data_directory__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '../data/'))
 # if this path does not exist fall back to system wide directory
 if not os.path.exists(__gtranscribe_data_directory__):
-    __gtranscribe_data_directory__ = sys.exec_prefix + '/share/gtranscribe/'
+    __gtranscribe_data_directory__ = sys.exec_prefix + '/share/gTranscribe/'
 
 def get_data_file(*path_segments):
     return os.path.join(__gtranscribe_data_directory__, *path_segments)

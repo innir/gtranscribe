@@ -27,7 +27,7 @@ import locale
 locale.setlocale(locale.LC_ALL, '')
 import gettext
 from gettext import gettext as _
-gettext.textdomain('gtranscribe')
+gettext.textdomain('gTranscribe')
 
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop
@@ -58,7 +58,7 @@ class gTranscribeWindow:
     
     def __init__(self):
         builder = gtk.Builder()
-        builder.set_translation_domain('gtranscribe')
+        builder.set_translation_domain('gTranscribe')
         builder.add_from_file(get_data_file('ui', 'gTranscribeWindow.ui'))
         builder.connect_signals(self)
 

@@ -19,7 +19,7 @@ import datetime
 import gtk
 import gettext
 from gettext import gettext as _
-gettext.textdomain('gtranscribe')
+gettext.textdomain('gTranscribe')
 
 from gtranscribe.helpers import ns_to_time, time_to_ns, trim
 
