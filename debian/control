@@ -8,7 +8,7 @@ Standards-Version: 3.9.4
 
 Package: gtranscribe
 Architecture: all
-Depends: ${misc:Depends}, python (>= 2.6.6-3~), python (<< 2.8), python-dbus, python-gobject-2, python-gst0.10, python-gtk2, python-gtkspell, gstreamer0.10-plugins-bad
+Depends: ${misc:Depends}, python (>= 2.6.6-3~), python (<< 2.8), python-dbus, python-gobject-2 | python-gobject (<< 3), python-gst0.10, python-gtk2, python-gtkspell, gstreamer0.10-plugins-bad
 Description: Software focussed on easy transcription of spoken words.
  An audio player designed to make the transcription of interviews and other 
  sources as easy as possible.
