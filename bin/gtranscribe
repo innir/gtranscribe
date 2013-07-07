@@ -497,6 +497,11 @@ class gTranscribeWindow:
             pos_str = ' [' + trim(ns_to_time(position).strftime(self.time_str)) + ']'
             text_buffer = self.text_view.get_buffer()
             text_buffer.insert_at_cursor(pos_str)
+       # handling for yellow footswitch "science" from cleware
+        if keyname == 'F9':
+            self.play_action.activate()
+        elif keyname == 'F4':
+            self.play_action.set_active(False)
 
     # Run main application window
     def main(self):
