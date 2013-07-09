@@ -1,0 +1,36 @@
+::: gTranscribe :::
+Audio player designed to make the transcription of interviews and other 
+sources as easy as possible.
+
+Author: Philip Rinn <rinni@gmx.net>
+Homepage: https://gtranscribe.googlecode.com
+
+
+:: Dependencies ::
+ - python (>= 2.6.6)
+ - python-distutils-extra (>= 2.18)
+ - python-dbus
+ - python-gobject
+ - python-gst0.10
+ - python-gtk2
+ - python-gtkspell
+ - gstreamer0.10-plugins-bad
+
+
+:: License ::
+gTranscribe is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License version 3 as 
+published by the Free Software Foundation.
+
+The icon of gTranscribe (gtranscribe.svg) is free software: you can redistribute
+it and/or modify it under the terms of the GNU Lesser General Public License
+version 2.1 as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU (Lesser) General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+

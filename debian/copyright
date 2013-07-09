@@ -1,10 +1,25 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: gtranscribe
+Upstream-Name: gTranscribe
 Upstream-Contact: Philip Rinn <rinni@gmx.net>
 Source: https://gtranscribe.googlecode.com
 
 Files: *
-Copyright: (C) 2010 Frederik Elwert <frederik.elwert@web.de>, (C) 2013 Philip Rinn <rinni@gmx.net>
+Copyright: 2010, Frederik Elwert <frederik.elwert@web.de>
+           2013, Philip Rinn <rinni@gmx.net>
+License: GPL-3
+
+Files: data/icons/scalable/apps/gtranscribe.svg
+Copyright: 2007, Jakub Steiner <jimmac@gmail.com>
+           2009, Stephen Brandt <stephen@stephenbrandt.com>
+           2013, Philip Rinn <rinni@gmx.net>
+License: LGPL-2.1
+ The full text of the GPL is distributed in
+ /usr/share/common-licenses/LGPL-2.1 on Debian systems.
+
+Files: debian/*
+Copyright: 2013, Philip Rinn <rinni@gmx.net>
+License: GPL-3
+
 License: GPL-3
  The full text of the GPL is distributed in
  /usr/share/common-licenses/GPL-3 on Debian systems.
