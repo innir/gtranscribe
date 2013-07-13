@@ -19,6 +19,7 @@ import sys
 import datetime
 import gtk
 import gio
+import hashlib
 import gettext
 from gettext import gettext as _
 gettext.textdomain('gTranscribe')
@@ -125,4 +126,15 @@ def error_message(self, message):
                                gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
     dialog.run()
     dialog.destroy()
+
+def md5_of_file(fname):
+    md5 = hashlib.md5()
+    f = open(fname, 'r')
+    while True:
+        data = f.read(81920)
+        if not data:
+            break
+        md5.update(data)
+    f.close()
+    return md5.hexdigest()
 

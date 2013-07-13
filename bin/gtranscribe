@@ -17,6 +17,9 @@
 
 import sys
 import os
+import os.path
+import glib
+import sqlite3
 import datetime
 import gobject
 gobject.threads_init()
@@ -109,7 +112,7 @@ class gTranscribeWindow:
         self.rewind_action = actions.get_action('rewind')
         self.rewind_action.connect_proxy(
                 builder.get_object('button_seek_back'))
-        
+
         recent_action = gtk.RecentAction('open_recent', _('_Recent files'),
                                          None, None)
         recent_filter = gtk.RecentFilter()
@@ -119,7 +122,7 @@ class gTranscribeWindow:
         recent_action.set_sort_type(gtk.RECENT_SORT_MRU)
         recent_action.connect('item-activated', self.open_recent)
         actions.add_action(recent_action)
-        
+
         self.ui = gtk.UIManager()
         self.window.add_accel_group(self.ui.get_accel_group())
         self.ui.insert_action_group(actions)
@@ -133,20 +136,20 @@ class gTranscribeWindow:
         self.player = gTranscribePlayer()
         self.player.connect('ready', self.on_file_ready)
         self.player.connect('ended', self.on_file_ended)
-        
+
         self.recent_manager = gtk.recent_manager_get_default()
-        
+
         self.speedscale = builder.get_object('scale_speed')
         self.speedscale.set_value(1)
         self.slider = builder.get_object('scale_position')
         self.seekscale = builder.get_object('scale_seek')
-        
+
         self.dur_label = builder.get_object('label_duration')
         self.pos_label = builder.get_object('label_position')
         self.time_str = '00:00.0'
         self.dur_label.set_text(self.time_str)
         self.pos_label.set_text(self.time_str)
-        
+
         self.oldstate = None
         self.seeking = False
         self.exact_seeking = True
@@ -175,7 +178,20 @@ class gTranscribeWindow:
             self.settings_daemon.connect_to_signal('MediaPlayerKeyPressed',
                                                    self.on_media_key)
             self.window.connect('focus-in-event', self.on_focus)
-        
+
+        #make sure our cache directory exists
+        self.cache_dir = os.path.join(glib.get_user_cache_dir(), "gTranscribe")
+        if not os.path.exists(self.cache_dir):
+            os.makedirs(self.cache_dir)
+
+        #set up metadata database
+        con = sqlite3.connect(os.path.join(self.cache_dir,"metadata.db"))
+        cur = con.cursor()
+        cur.execute('CREATE TABLE IF NOT EXISTS metadata(md5 TEXT PRIMARY KEY, position INTEGER, speed REAL)')
+        con.commit()
+        cur.close()
+        con.close()
+
         if filepath:
             # Open a file passed as commandline parameter.
             # Use idle_add so window is settled.
@@ -196,7 +212,7 @@ class gTranscribeWindow:
                 # source no longer available, do nothing
                 pass
             self._update_id = None
-            
+
     update_ui = property(_get_update_ui, _set_update_ui)
 
     # Called when the user clicks the 'About' menu. We use gtk_show_about_dialog() 
@@ -223,24 +239,32 @@ class gTranscribeWindow:
         if result == gtk.RESPONSE_OK:
             self.open_file(open_dlg.get_filename())
         open_dlg.destroy()
-        
+
     def open_recent(self, item):
         uri = item.get_current_uri()
         path = uri_to_filepath(uri)
         self.open_file(path)
-        
+
     def open_file(self, filepath):
         self.play_action.set_active(False)
         self.slider.set_value(0)
         self.recent_manager.add_item(filepath_to_uri(filepath))
+        self.md5 = md5_of_file(filepath)
+        # insert md5 into database so we can just update afterwards
+        con = sqlite3.connect(os.path.join(self.cache_dir,"metadata.db"))
+        cur = con.cursor()
+        cur.execute('INSERT OR IGNORE INTO metadata (md5) VALUES (?)',(self.md5,))
+        con.commit()
+        cur.close()
+        con.close()
         self.player.open(filepath)
-            
+
     def on_file_ready(self, signal, filepath):
         logging.debug('received signal "ready"')
         gobject.idle_add(self.update_file, filepath)
-        
+
     def update_file(self, filepath):
-        fileinfo = FileInfo(filepath)
+        fileinfo = FileInfo(filepath, self.md5)
         if fileinfo.position:
             logging.debug('Resuming at position %s' % ns_to_time(fileinfo.position))
             self.player.position = fileinfo.position
@@ -249,10 +273,10 @@ class gTranscribeWindow:
             logging.debug('Resuming with speed %s' % fileinfo.speed)
             self.speedscale.set_value(fileinfo.speed)
         duration = ns_to_time(self.player.duration)
-        try:
-            position = ns_to_time(self.player.position)
-        except QueryError:
-            position = datetime.time()
+#         try:
+#             position = ns_to_time(self.player.position)
+#         except QueryError:
+#             position = datetime.time()
         if duration.hour:
             self.time_str = '%H:%M:%S.%f'
         else:
@@ -262,13 +286,13 @@ class gTranscribeWindow:
         filename = os.path.basename(filepath)
         self.window.set_title(u'gTranscribe \u2013 %s' % filename)
         gobject.idle_add(self.play_loop, True)
-        
+
     def on_file_ended(self, signal):
         logging.debug('received signal "ended"')
         self.window.update_ui = False
         self._set_update_ui(False)
         self.play_action.set_active(False)
-        
+
     def on_media_key(self, application, key):
         logging.debug('Received media key %s for %s' % (key, application))
         if application == 'gTranscribe':
@@ -280,11 +304,11 @@ class gTranscribeWindow:
                 self.forward(None)
             elif key == 'Previous':
                 self.rewind(None)
-                
+
     def on_focus(self, widget, event):
         if self.settings_daemon:
             self.settings_daemon.GrabMediaPlayerKeys('gTranscribe', 0)
-        
+
     def play(self, action):
         logging.debug('play action triggered')
         if action.get_active():
@@ -304,22 +328,26 @@ class gTranscribeWindow:
                     newpos = 0
                 self.player.position = newpos
                 gobject.idle_add(self.play_loop, True)
-            fileinfo = FileInfo(self.player.filename)
+            fileinfo = FileInfo(self.player.filename, self.md5)
             try:
                 fileinfo.position = self.player.position
             except QueryError:
                 # position cannot be found out
                 # so do nothing until we find a better way
                 # to deal with QueryErrors
-                logging.warn('query failed, cannot save current position')
+                logging.warn("query failed, can't save current position")
                 pass
-    
+
     def play_loop(self, once=False):
         try:
             position = self.player.position
+        except QueryError:
+            logging.warn("query failed, can't get current position")
+            return False
+        try:
             duration = self.player.duration
         except QueryError:
-            logging.warn("query failed, can't get current position and/or file duration")
+            logging.warn("query failed, can't get file duration")
             return False
         frac = float(position) / float(duration)
         scalepos = frac * self.slider.get_adjustment().get_upper()
@@ -330,33 +358,33 @@ class gTranscribeWindow:
             return False
         else:
             return True
-        
+
     def change_speed(self, action):
         if action.get_name() == 'slower':
             self.speedscale.set_value(self.speedscale.get_value() - 0.1)
         else:
             self.speedscale.set_value(self.speedscale.get_value() + 0.1)
-        
+
     def forward(self, action):
         new_position = self.player.position + time_to_ns(self.SEEK_INTERVAL)
         if new_position > self.player.duration:
             new_position = self.player.duration
         self.player.position = new_position
         gobject.idle_add(self.play_loop, True)
-        
+
     def rewind(self, action):
         new_position = self.player.position - time_to_ns(self.SEEK_INTERVAL)
         if new_position < 0:
             new_position = 0
         self.player.position = new_position
         gobject.idle_add(self.play_loop, True)
-        
+
     def copy_position(self, action):
         position = self.player.position
         pos_str = trim(ns_to_time(position).strftime(self.time_str))
         clipboard = gtk.clipboard_get()
         clipboard.set_text(self.TIMESTAMP_FORMAT % pos_str)
-    
+
     def skip_to(self, action):
         skip_dlg = SkiptoDialog.SkiptoDialog()
         skip_dlg.time_format = self.time_str
@@ -369,17 +397,17 @@ class gTranscribeWindow:
             self.player.position = int(skip_dlg.spinbutton.get_value())
             gobject.idle_add(self.play_loop, True)
         skip_dlg.destroy()
-        
+
     def on_scale_speed_format_value(self, widget, value, data=None):
         return u'%s\xd7' % locale.format('%.1f', value)
-        
+
     def on_scale_speed_value_changed(self, range):
         value = range.get_value()
         if value != self.player.rate:
             self.player.rate = value
-            fileinfo = FileInfo(self.player.filename)
+            fileinfo = FileInfo(self.player.filename, self.md5)
             fileinfo.speed = value
-            
+
     def on_scale_position_value_changed(self, range):
         if not self.seeking:
             # Slider changed programmatically, do nothing
@@ -388,7 +416,7 @@ class gTranscribeWindow:
         max_value = self.slider.get_adjustment().get_upper()
         new_position = self.player.duration * (value/max_value)
         self.player.position = new_position
-        
+
     def on_scale_position_button_press_event(self, widget, event):
         logging.debug('Begin seeking')
         self.oldstate = self.player.state
@@ -396,7 +424,7 @@ class gTranscribeWindow:
         self.seeking = True
         self.window.update_ui = True
         self._set_update_ui(True)
-        
+
     def on_scale_position_button_release_event(self, widget, event):
         logging.debug('End seeking')
         self.seeking = False
@@ -414,10 +442,10 @@ class gTranscribeWindow:
             oldpos = self.player.position
             self.player.position = oldpos + seekvalue * 100000000
         return self.exact_seeking
-        
+
     def on_volumebutton_value_changed(self, scalebutton, value):
         self.player.volume = value
-        
+
     def quit(self, widget, data=None):
         """Signal handler for closing the gTranscribeWindow."""
         self.on_destroy(widget, data=None)
@@ -426,7 +454,7 @@ class gTranscribeWindow:
         """Called when the gTranscribeWindow is closed."""
         # Clean up code for saving application state should be added here.
         if self.player.filename:
-            fileinfo = FileInfo(self.player.filename)
+            fileinfo = FileInfo(self.player.filename, self.md5)
             fileinfo.position = self.player.position
             fileinfo.speed = self.player.rate
         if self.settings_daemon:
@@ -451,6 +479,7 @@ class gTranscribeWindow:
                 fin.close()
                 # get possibly the last position
                 pos = text[-10:-1]
+                logging.debug('Try to get the last position from %s' % pos)
                 pos_tag = re.compile('\[\d\d:\d\d.\d\]')
                 if pos_tag.match(pos):
                     pos = pos[-8:-1]
@@ -489,7 +518,7 @@ class gTranscribeWindow:
         except:
             # error writing file, show message to user
             error_message(self, "Could not save file: %s" % self.filename)
-        
+
     def on_text_insert(self, widget, event):
         keyname = gtk.gdk.keyval_name(event.keyval)
         if keyname == 'Return':

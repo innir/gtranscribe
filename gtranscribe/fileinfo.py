@@ -14,14 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sqlite3
+import glib
+import os.path
 import logging
 logger = logging.getLogger('fileinfo')
-import gio
 
-POSITION_ATTRIBUTE = "metadata::totem::position"
-SPEED_ATTRIBUTE = "metadata::gtranscribe::speed"
-MSECOND = 1000000
-
+database = os.path.join(glib.get_user_cache_dir(), "gTranscribe","metadata.db")
 
 class FileInfo (object):
     """
@@ -32,56 +31,64 @@ class FileInfo (object):
     
     """
 
-    def __init__(self, filepath):
+    def __init__(self, filepath, md5):
         self.filepath = filepath
+        self.md5 = md5
         self._cache = {}
-        
-    def _get_gio_attribute(self, attribute):
+
+    def _get_data(self, attribute):
         """
-        A generic method to hide the verbose process of getting GIO attributes.
+        A generic method to hide the verbose process of getting attributes.
         
         """
         # Use cached values if available to limit requests
         if attribute in self._cache:
             return self._cache[attribute]
-        file = gio.File(path=self.filepath)
-        info = file.query_info(attribute)
-        value = info.get_attribute_as_string(attribute)
+        con = sqlite3.connect(database)
+        cur = con.cursor()
+        query = 'SELECT ' + attribute + ' FROM metadata WHERE md5=?'
+        cur.execute(query, (self.md5,))
+        value = cur.fetchone()[0]
+        cur.close()
+        con.close()
         self._cache[attribute] = value
         logger.debug('Get attribute "%s": %s' % (attribute, value))
         return value
-        
-    def _set_gio_attribute(self, attribute, value):
+
+    def _set_data(self, attribute, value):
         """
         A generic method to hide the verbose process of setting GIO attributes.
         
         """
         logger.debug('Set attribute "%s": %s' % (attribute, value))
-        file = gio.File(path=self.filepath)
-        info = file.query_info(attribute)
-        info.set_attribute_string(attribute, str(value))
-        file.set_attributes_from_info(info)
+        query = 'UPDATE metadata SET ' + attribute + '=? WHERE md5=?'
+        con = sqlite3.connect(database)
+        cur = con.cursor()
+        cur.execute(query, (value, self.md5))
+        con.commit()
+        cur.close()
+        con.close()
         self._cache[attribute] = value
-        
-    def _get_position(self):
-        position = self._get_gio_attribute(POSITION_ATTRIBUTE)
-        if position:
-            position = int(position) * MSECOND
-        return position
-    
-    def _set_position(self, position):
-        self._set_gio_attribute(POSITION_ATTRIBUTE, str(position / MSECOND))
-        
-    position = property(_get_position, _set_position)
-    
-    def _get_speed(self):
-        speed = self._get_gio_attribute(SPEED_ATTRIBUTE)
-        if speed:
-            speed = float(speed)
-        return speed
-        
-    def _set_speed(self, speed):
-        self._set_gio_attribute(SPEED_ATTRIBUTE, str(speed))
-        
-    speed = property(_get_speed, _set_speed)
 
+    def _get_position(self):
+        position = self._get_data("position")
+        if not isinstance(position, (int, long)):
+            position = 0
+        return position
+
+    def _set_position(self, position):
+        self._set_data("position", position)
+        return True
+
+    def _get_speed(self):
+        speed = self._get_data("speed")
+        if not isinstance(speed, float):
+            speed = 1.0
+        return speed
+
+    def _set_speed(self, speed):
+        self._set_data("speed", speed)
+        return True
+
+    position = property(_get_position, _set_position)
+    speed = property(_get_speed, _set_speed)

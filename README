@@ -14,6 +14,7 @@ Homepage: https://gtranscribe.googlecode.com
  - python-gst0.10
  - python-gtk2
  - python-gtkspell
+ - python-sqlite2
  - gstreamer0.10-plugins-bad
 
 
