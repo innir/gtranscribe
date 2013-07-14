@@ -57,7 +57,7 @@ class FileInfo (object):
 
     def _set_data(self, attribute, value):
         """
-        A generic method to hide the verbose process of setting GIO attributes.
+        A generic method to hide the verbose process of setting attributes.
         
         """
         logger.debug('Set attribute "%s": %s' % (attribute, value))
