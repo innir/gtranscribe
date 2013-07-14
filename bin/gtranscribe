@@ -266,6 +266,7 @@ class gTranscribeWindow:
         gobject.idle_add(self.update_file, filepath)
 
     def update_file(self, filepath):
+        self.position = 0
         fileinfo = FileInfo(filepath, self.md5)
         if fileinfo.position:
             logging.debug('Resuming at position %s' % ns_to_time(fileinfo.position))
@@ -279,11 +280,14 @@ class gTranscribeWindow:
             self.time_str = '%H:%M:%S.%f'
         else:
             self.time_str = '%M:%S.%f'
+        # set duration
         dur_str = trim(duration.strftime(self.time_str))
         self.dur_label.set_text(dur_str)
+        # set position
+        self.set_position_label(time_to_ns(duration))
+        # set window title
         filename = os.path.basename(filepath)
         self.window.set_title(u'gTranscribe \u2013 %s' % filename)
-        gobject.idle_add(self.play_loop, True)
 
     def on_file_ended(self, signal):
         logging.debug('received signal "ended"')
@@ -340,15 +344,18 @@ class gTranscribeWindow:
         except QueryError:
             logging.warn("query failed, can't get file duration")
             return False
+        self.set_position_label(duration)
+        if once:
+            return False
+        else:
+            return True
+
+    def set_position_label(self, duration):
         frac = float(self.position) / float(duration)
         scalepos = frac * self.slider.get_adjustment().get_upper()
         self.slider.set_value(scalepos)
         pos_str = trim(ns_to_time(self.position).strftime(self.time_str))
         self.pos_label.set_text(pos_str)
-        if once:
-            return False
-        else:
-            return True
 
     def change_speed(self, action):
         if action.get_name() == 'slower':

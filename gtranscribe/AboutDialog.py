@@ -22,13 +22,12 @@ gettext.textdomain('gTranscribe')
 class AboutDialog:
 
     def __init__(self, trans):
-        authors = [ "Frederik Elwert <frederik.elwert@web.de>",
-        "Philip Rinn <rinni@gmx.net>"]
+        authors = ["Philip Rinn <rinni@gmx.net>"]
         self.about_dialog = gtk.AboutDialog()
         self.about_dialog.set_transient_for(trans.window)
         self.about_dialog.set_destroy_with_parent(True)
         self.about_dialog.set_name("gTranscribe")
-        self.about_dialog.set_version("0.1")
+        self.about_dialog.set_version("0.2")
         self.about_dialog.set_copyright("Copyright \xc2\xa9 2010 Frederik Elwert\nCopyright \xc2\xa9 2013 Philip Rinn")
         self.about_dialog.set_comments(_("gTranscribe is a software focussed on easy transcription of spoken words."))
         self.about_dialog.set_website("https://gtranscribe.googlecode.com")

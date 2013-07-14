@@ -1,3 +1,9 @@
+gtranscribe (0.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Philip Rinn <rinni@gmx.net>  Sun, 14 Jul 2013 12:52:13 +0200
+
 gtranscribe (0.1-1) unstable; urgency=low
 
   * Initial release.

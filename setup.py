@@ -20,7 +20,7 @@ assert DistUtilsExtra.auto.__version__ >= '2.18', 'gTranscribe needs DistUtilsEx
 
 DistUtilsExtra.auto.setup(
     name='gTranscribe',
-    version='0.1',
+    version='0.2',
     license='GPL-3',
     author='Philip Rinn',
     author_email='rinni@gmx.net',
