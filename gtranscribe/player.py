@@ -162,6 +162,7 @@ class gTranscribePlayer(gobject.GObject):
         # Force decoding of file so we have a duration
         self.pipeline.set_state(gst.STATE_PLAYING)
         self.pipeline.set_state(gst.STATE_PAUSED)
+        self._duration = None
 
     def play(self):
         """Start playback from current position."""
