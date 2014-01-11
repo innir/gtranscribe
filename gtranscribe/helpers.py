@@ -17,8 +17,7 @@
 import os
 import sys
 import datetime
-import gtk
-import gio
+from gi.repository import Gtk, Gio
 import hashlib
 import gettext
 from gettext import gettext as _
@@ -85,45 +84,45 @@ def time_to_ns(time):
     return sum(values)
     
 def filepath_to_uri(path):
-    file = gio.File(path=path)
+    file = Gio.File.new_for_path(path)
     return file.get_uri()
 
 def uri_to_filepath(uri):
-    file = gio.File(uri=uri)
+    file = Gio.File.new_for_uri(uri)
     return file.get_path()
 
 def get_open_filename(self):
     filename = None
-    chooser = gtk.FileChooserDialog(_("Open File..."), self.window,
-                                    gtk.FILE_CHOOSER_ACTION_OPEN,
-                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, 
-                                     gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-    filter = gtk.FileFilter()
+    chooser = Gtk.FileChooserDialog(_("Open File..."), self.window,
+                                    Gtk.FileChooserAction.OPEN,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                     Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+    filter = Gtk.FileFilter()
     filter.set_name(_('Plain Text Files'))
     filter.add_mime_type('text/plain')
     chooser.add_filter(filter)
     chooser.set_filter(filter)
 
     response = chooser.run()
-    if response == gtk.RESPONSE_OK: filename = chooser.get_filename()
+    if response == Gtk.ResponseType.OK: filename = chooser.get_filename()
     chooser.destroy()
     return filename
 
 def get_save_filename(self):
     filename = None
-    chooser = gtk.FileChooserDialog(_("Save File..."), self.window,
-                                    gtk.FILE_CHOOSER_ACTION_SAVE,
-                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, 
-                                     gtk.STOCK_SAVE, gtk.RESPONSE_OK))
+    chooser = Gtk.FileChooserDialog(_("Save File..."), self.window,
+                                    Gtk.FileChooserAction.SAVE,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                     Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
     response = chooser.run()
-    if response == gtk.RESPONSE_OK: filename = chooser.get_filename()
+    if response == Gtk.ResponseType.OK: filename = chooser.get_filename()
     chooser.destroy()
     return filename
 
 def error_message(self, message):
-    dialog = gtk.MessageDialog(None,
-                               gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                               gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
+    dialog = Gtk.MessageDialog(None,
+                               Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                               Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message)
     dialog.run()
     dialog.destroy()
 

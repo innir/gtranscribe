@@ -16,7 +16,7 @@
 
 import ctypes
 import datetime
-import gtk
+from gi.repository import Gtk
 import gettext
 from gettext import gettext as _
 gettext.textdomain('gTranscribe')
@@ -27,19 +27,19 @@ class SkiptoDialog:
 
     def __init__(self):
         self.time_format = '%M:%S.%f'
-        label = gtk.Label(_("Skip to:"))
-        box = gtk.HBox()
-        self.skipDialog = gtk.Dialog(_("Skip to ..."),
+        label = Gtk.Label(label=_("Skip to:"))
+        box = Gtk.HBox()
+        self.skipDialog = Gtk.Dialog(_("Skip to ..."),
                            None,
-                           gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                           (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                            gtk.STOCK_OK, gtk.RESPONSE_OK))
-        self.skipDialog.vbox.pack_start(box)
-        box.pack_start(label)
-        self.spinbutton = gtk.SpinButton()
+                           Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                           (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                            Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        self.skipDialog.vbox.pack_start(box, True, True, 0)
+        box.pack_start(label, True, True, 0)
+        self.spinbutton = Gtk.SpinButton()
         self.spinbutton.connect("input",self.on_spinbutton_time_input)
         self.spinbutton.connect("output",self.on_spinbutton_time_output)
-        box.pack_end(self.spinbutton)
+        box.pack_end(self.spinbutton, True, True, 0)
         self.spinbutton.show()
         label.show()
         box.show()

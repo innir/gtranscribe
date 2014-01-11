@@ -19,9 +19,9 @@ import sys
 import os
 import glib
 import sqlite3
-import gobject
-gobject.threads_init()
-import gtk
+import gi
+from gi.repository import GObject, Gtk, GtkSpell
+GObject.threads_init()
 import re
 import logging
 import optparse
@@ -35,9 +35,6 @@ gettext.textdomain('gTranscribe')
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop
 DBusGMainLoop(set_as_default=True)
-
-#from gtkspellcheck import SpellChecker 
-from gtkspell import Spell as SpellChecker
 
 # Add project root directory (enable symlink, and trunk execution).
 PROJECT_ROOT_DIRECTORY = os.path.abspath(
@@ -53,56 +50,58 @@ if python_path:
 
 from gtranscribe import SkiptoDialog
 from gtranscribe import AboutDialog
-from gtranscribe.helpers import * 
-from gtranscribe.player import gTranscribePlayer, QueryError
+from gtranscribe.helpers import *
+from gtranscribe.player import gTranscribePlayer QueryError
 from gtranscribe.fileinfo import FileInfo
 
 class gTranscribeWindow:
     
     def __init__(self):
-        builder = gtk.Builder()
+        builder = Gtk.Builder()
         builder.set_translation_domain('gTranscribe')
         builder.add_from_file(get_data_file('ui', 'gTranscribeWindow.ui'))
         builder.connect_signals(self)
 
         self.window = builder.get_object("gtranscribe_window")
         self.text_view = builder.get_object("text_view")
-        spellchecker = SpellChecker(self.text_view, locale.getdefaultlocale()[0])
+        spellchecker = GtkSpell.Checker()
+        spellchecker.set_language(locale.getdefaultlocale()[0])
+        spellchecker.attach(self.text_view)
         self.icon_play = builder.get_object("icon_play")
         self.spinbutton_jump = builder.get_object("spinbutton_jump")
         self.spinbutton_jump.set_range(0, 5000)
         self.spinbutton_jump.set_increments(10, 100)
 
-        actions = gtk.ActionGroup('Actions')
+        actions = Gtk.ActionGroup('Actions')
         actions.add_actions((('menu_file', None, _('_File')),
                              ('menu_playback', None, _('_Playback')),
                              ('menu_help', None, _('_Help')),
                              
-                             ('open', gtk.STOCK_OPEN, None,
+                             ('open', Gtk.STOCK_OPEN, None,
                              '<Ctrl>o', None, self.open),
-                             ('open_text', gtk.STOCK_OPEN, _('Open Text'),
+                             ('open_text', Gtk.STOCK_OPEN, _('Open Text'),
                              '<Ctrl>t', None, self.on_open_menu_item_activate),
-                             ('save', gtk.STOCK_SAVE, None,
+                             ('save', Gtk.STOCK_SAVE, None,
                              '<Ctrl>s', None, self.on_save_menu_item_activate),
-                             ('quit', gtk.STOCK_QUIT, None,
+                             ('quit', Gtk.STOCK_QUIT, None,
                               '<Ctrl>q', None, self.quit),
                               
                              ('slower', None, _('Slower'),
                               '<Ctrl>d', None, self.change_speed),
                              ('faster', None, _('Faster'),
                               '<Ctrl>f', None, self.change_speed),
-                             ('forward', gtk.STOCK_MEDIA_FORWARD, None,
+                             ('forward', Gtk.STOCK_MEDIA_FORWARD, None,
                               '<Ctrl>Right', None, self.forward),
-                             ('rewind', gtk.STOCK_MEDIA_REWIND, None,
+                             ('rewind', Gtk.STOCK_MEDIA_REWIND, None,
                               '<Ctrl>Left', None, self.rewind),
                              ('skip', None, _('Skip to ...'),
                               '<Ctrl>k', None, self.skip_to),
                               
-                             ('about', gtk.STOCK_ABOUT, None,
+                             ('about', Gtk.STOCK_ABOUT, None,
                               None, None, self.about)
                              ))
-        self.play_action = gtk.ToggleAction('play', None, None, 
-                                            gtk.STOCK_MEDIA_PLAY)
+        self.play_action = Gtk.ToggleAction('play', None, None,
+                                            Gtk.STOCK_MEDIA_PLAY)
         self.play_action.connect_proxy(builder.get_object('button_play'))
         self.play_action.connect('activate', self.play)
         actions.add_action_with_accel(self.play_action, '<Ctrl>space')
@@ -113,23 +112,23 @@ class gTranscribeWindow:
         self.rewind_action.connect_proxy(
                 builder.get_object('button_seek_back'))
 
-        recent_action = gtk.RecentAction('open_recent', _('_Recent files'),
+        recent_action = Gtk.RecentAction('open_recent', _('_Recent files'),
                                          None, None)
-        recent_filter = gtk.RecentFilter()
+        recent_filter = Gtk.RecentFilter()
         recent_filter.add_mime_type('audio/*,text/plain')
         recent_action.add_filter(recent_filter)
         recent_action.set_filter(recent_filter)
-        recent_action.set_sort_type(gtk.RECENT_SORT_MRU)
+        recent_action.set_sort_type(Gtk.RecentSortType.MRU)
         recent_action.connect('item-activated', self.open_recent)
         actions.add_action(recent_action)
 
-        self.ui = gtk.UIManager()
+        self.ui = Gtk.UIManager()
         self.window.add_accel_group(self.ui.get_accel_group())
         self.ui.insert_action_group(actions)
         self.ui.add_ui_from_file(get_data_file('ui', 'gTranscribeMenu.ui'))
         vbox = builder.get_object('vbox1')
         menubar = self.ui.get_widget('/menubar_main')
-        vbox.pack_start(menubar, expand=False)
+        vbox.pack_start(menubar, False, True, 0)
         vbox.reorder_child(menubar, 0)
 
         # Code for other initialization actions should be added here.
@@ -137,7 +136,7 @@ class gTranscribeWindow:
         self.player.connect('ready', self.on_file_ready)
         self.player.connect('ended', self.on_file_ended)
 
-        self.recent_manager = gtk.recent_manager_get_default()
+        self.recent_manager = Gtk.RecentManager.get_default()
 
         self.speedscale = builder.get_object('scale_speed')
         self.speedscale.set_value(1)
@@ -197,19 +196,19 @@ class gTranscribeWindow:
         if filepath:
             # Open a file passed as commandline parameter.
             # Use idle_add so window is settled.
-            gobject.idle_add(self.open_file, filepath)
+            GObject.idle_add(self.open_file, filepath)
             
     def _get_update_ui(self):
         return self._update_id is not None
         
     def _set_update_ui(self, update):
         if update:
-            self._update_id = gobject.timeout_add(50, self.play_loop)
+            self._update_id = GObject.timeout_add(50, self.play_loop)
         else:
             # run play_loop one more time to make sure UI is up to date.
             self.play_loop()
             try:
-                gobject.source_remove(self._update_id)
+                GObject.source_remove(self._update_id)
             except TypeError:
                 # source no longer available, do nothing
                 pass
@@ -228,17 +227,17 @@ class gTranscribeWindow:
         self.about_dialog = True
 
     def open(self, action):
-        open_dlg = gtk.FileChooserDialog(_('Open Audio File'), self.window,
-                                         gtk.FILE_CHOOSER_ACTION_OPEN,
-                                         (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                          gtk.STOCK_OK, gtk.RESPONSE_OK))
-        filter = gtk.FileFilter()
+        open_dlg = Gtk.FileChooserDialog(_('Open Audio File'), self.window,
+                                         Gtk.FileChooserAction.OPEN,
+                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                          Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        filter = Gtk.FileFilter()
         filter.set_name(_('All Audio Files'))
         filter.add_mime_type('audio/*')
         open_dlg.add_filter(filter)
         open_dlg.set_filter(filter)
         result = open_dlg.run()
-        if result == gtk.RESPONSE_OK:
+        if result == Gtk.ResponseType.OK:
             self.open_file(open_dlg.get_filename())
         open_dlg.destroy()
 
@@ -263,7 +262,7 @@ class gTranscribeWindow:
 
     def on_file_ready(self, signal, filepath):
         logging.debug('received signal "ready"')
-        gobject.idle_add(self.update_file, filepath)
+        GObject.idle_add(self.update_file, filepath)
 
     def update_file(self, filepath):
         self.position = 0
@@ -314,12 +313,12 @@ class gTranscribeWindow:
     def play(self, action):
         logging.debug('play action triggered')
         if action.get_active():
-            self.icon_play.set_from_stock(gtk.STOCK_MEDIA_PAUSE,2)
+            self.icon_play.set_from_stock(Gtk.STOCK_MEDIA_PAUSE,2)
             self.player.play()
             self.window.update_ui = True
             self._set_update_ui(True)
         else:
-            self.icon_play.set_from_stock(gtk.STOCK_MEDIA_PLAY,2)
+            self.icon_play.set_from_stock(Gtk.STOCK_MEDIA_PLAY,2)
             self.window.update_ui = False
             self._set_update_ui(False)
             self.player.pause()
@@ -329,7 +328,7 @@ class gTranscribeWindow:
                 if newpos < 0:
                     newpos = 0
                 self.player.position = newpos
-                gobject.idle_add(self.play_loop, True)
+                GObject.idle_add(self.play_loop, True)
             fileinfo = FileInfo(self.player.filename, self.md5)
             fileinfo.position = self.position
 
@@ -368,18 +367,18 @@ class gTranscribeWindow:
         if new_position > self.player.duration:
             new_position = self.player.duration
         self.player.position = new_position
-        gobject.idle_add(self.play_loop, True)
+        GObject.idle_add(self.play_loop, True)
 
     def rewind(self, action):
         new_position = self.position - time_to_ns(self.SEEK_INTERVAL)
         if new_position < 0:
             new_position = 0
         self.player.position = new_position
-        gobject.idle_add(self.play_loop, True)
+        GObject.idle_add(self.play_loop, True)
 
     def copy_position(self, action):
         pos_str = trim(ns_to_time(self.position).strftime(self.time_str))
-        clipboard = gtk.clipboard_get()
+        clipboard = Gtk.clipboard_get()
         clipboard.set_text(self.TIMESTAMP_FORMAT % pos_str)
 
     def skip_to(self, action):
@@ -390,9 +389,9 @@ class gTranscribeWindow:
         skip_dlg.spinbutton.set_increments(page / 10, page)
         skip_dlg.spinbutton.set_value(self.position)
         response = skip_dlg.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             self.player.position = int(skip_dlg.spinbutton.get_value())
-            gobject.idle_add(self.play_loop, True)
+            GObject.idle_add(self.play_loop, True)
         skip_dlg.destroy()
 
     def on_scale_speed_format_value(self, widget, value, data=None):
@@ -456,7 +455,7 @@ class gTranscribeWindow:
             fileinfo.speed = self.player.rate
         if self.settings_daemon:
             self.settings_daemon.ReleaseMediaPlayerKeys('gTranscribe')
-        gtk.main_quit()
+        Gtk.main_quit()
 
     def on_jump_value_changed(self, range):
         self.JUMP_BACK_INTERVAL = ns_to_time(range.get_value_as_int()*1000000)
@@ -483,7 +482,7 @@ class gTranscribeWindow:
                     pos_tag = re.compile('\d\d:\d\d.\d')
                     if pos_tag.match(pos):
                         self.player.position = time_to_ns(datetime.datetime.strptime(pos,"%M:%S.%f"))
-                        gobject.idle_add(self.play_loop, True)
+                        GObject.idle_add(self.play_loop, True)
                         logging.debug('Set position on load')
                 # disable the text view while loading the buffer with the text
                 self.text_view.set_sensitive(False)
@@ -517,7 +516,7 @@ class gTranscribeWindow:
             error_message(self, "Could not save file: %s" % self.filename)
 
     def on_text_insert(self, widget, event):
-        keyname = gtk.gdk.keyval_name(event.keyval)
+        keyname = Gdk.keyval_name(event.keyval)
         if keyname == 'Return':
             pos_str = ' [' + trim(ns_to_time(self.position).strftime(self.time_str)) + ']'
             text_buffer = self.text_view.get_buffer()
@@ -533,7 +532,7 @@ class gTranscribeWindow:
         self.spinbutton_jump.set_value(time_to_ns(self.JUMP_BACK_INTERVAL)/1000000)
         self.window.connect('key_press_event', self.on_text_insert)
         self.window.show()
-        gtk.main()
+        Gtk.main()
 
 
 if __name__ == "__main__":

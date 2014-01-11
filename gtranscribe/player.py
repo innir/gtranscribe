@@ -16,54 +16,64 @@
 
 import logging
 logger = logging.getLogger('player')
+import gi
+gi.require_version('Gst', '1.0')
+from gi.repository import Gst, GObject
+Gst.init(None)
 
-import pygst
-pygst.require('0.10')
-import gst
-import gobject
-
-QueryError = gst.QueryError # for imports in GUI
+QueryError = Gst.QueryError # for imports in GUI
 
 
-class gTranscribePlayer(gobject.GObject):
+class gTranscribePlayer(GObject.GObject):
 
     __gtype_name__ = 'gTranscribePlayer'
 
     __gsignals__ = {
-        'ready': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, 
-                  (gobject.TYPE_STRING,)),
-        'ended': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+        'ready': (GObject.SignalFlags.RUN_LAST, None,
+                  (GObject.TYPE_STRING,)),
+        'ended': (GObject.SignalFlags.RUN_LAST, None,
                   ())
     }
 
     def __init__(self):
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
 
         self._rate = 1
         self._duration = None
 
-        self.pipeline = gst.Pipeline('pipeline_main')
-        self.audiosrc = gst.element_factory_make('filesrc', 'audio')
-        self.decoder = gst.element_factory_make('decodebin', 'decoder')
-        self.convert1 = gst.element_factory_make('audioconvert', 'convert1')
-        self.resample1 = gst.element_factory_make('audioresample', 'resample1')
-        self.volume1 = gst.element_factory_make('volume', 'volume')
+        self.pipeline = Gst.Pipeline()
+        self.audiosrc = Gst.ElementFactory.make('filesrc', 'audio')
+        self.decoder = Gst.ElementFactory.make('decodebin', 'decoder')
+        self.convert1 = Gst.ElementFactory.make('audioconvert', 'convert1')
+        self.resample1 = Gst.ElementFactory.make('audioresample', 'resample1')
+        self.volume1 = Gst.ElementFactory.make('volume', 'volume')
         self.volume1.set_property('volume', 1)
-        self.scaletempo = gst.element_factory_make('scaletempo', 'scaletempo')
-        self.convert2 = gst.element_factory_make('audioconvert', 'convert2')
-        self.resample2 = gst.element_factory_make('audioresample', 'resample2')
-        self.sink = gst.element_factory_make('autoaudiosink', 'sink')
+        self.scaletempo = Gst.ElementFactory.make('scaletempo', 'scaletempo')
+        self.convert2 = Gst.ElementFactory.make('audioconvert', 'convert2')
+        self.resample2 = Gst.ElementFactory.make('audioresample', 'resample2')
+        self.sink = Gst.ElementFactory.make('autoaudiosink', 'sink')
 
         self.decoder.connect('new-decoded-pad', self.on_new_decoded_pad)
 
-        self.pipeline.add(self.audiosrc, self.decoder, self.convert1,
-                self.volume1, self.resample1, self.scaletempo, self.convert2,
-                self.resample2, self.sink)
+        self.pipeline.add(self.audiosrc)
+        self.pipeline.add(self.decoder)
+        self.pipeline.add(self.convert1)
+        self.pipeline.add(self.volume1)
+        self.pipeline.add(self.resample1)
+        self.pipeline.add(self.scaletempo)
+        self.pipeline.add(self.convert2)
+        self.pipeline.add(self.resample2)
+        self.pipeline.add(self.sink)
         self.audiosrc.link(self.decoder)
-        gst.element_link_many(self.convert1, self.resample1, self.volume1, 
-                self.scaletempo, self.convert2, self.resample2, self.sink)
+        
+        self.convert1.link(self.resample1)
+        self.resample1.link(self.volume1)
+        self.volume1.link1(self.scaletempo)
+        self.scaletempo.link(self.convert2)
+        self.convert2.link(self.resample2)
+        self.resample2.link(self.sink)
 
-        self.apad = self.convert1.get_pad('sink')
+        self.apad = self.convert1.get_static_pad('sink')
 
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
@@ -77,44 +87,44 @@ class gTranscribePlayer(gobject.GObject):
     def duration(self):
         """Return the duration of the current stream."""
         if self._duration == None:
-            self._duration = self.pipeline.query_duration(gst.FORMAT_TIME, None)[0]
+            self._duration = self.pipeline.query_duration(Gst.Format.TIME, None)[0]
         return self._duration
 
     def _get_position(self):
         """Return the position of the current stream."""
-        pos = self.pipeline.query_position(gst.FORMAT_TIME, None)[0]
+        pos = self.pipeline.query_position(Gst.Format.TIME, None)[0]
         return pos
 
     def _set_position(self, position):
         self.pipeline.seek(self._rate,
-                           gst.FORMAT_TIME,
-                           gst.SEEK_FLAG_FLUSH | gst.SEEK_FLAG_ACCURATE,
-                           gst.SEEK_TYPE_SET, position,
-                           gst.SEEK_TYPE_NONE, -1)
+                           Gst.Format.TIME,
+                           Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE,
+                           Gst.SeekType.SET, position,
+                           Gst.SeekType.NONE, -1)
 
     position = property(_get_position, _set_position)
 
     @property
     def playing(self):
         """Return if pipeline is currently playing."""
-        return gst.STATE_PLAYING in self.pipeline.get_state()
+        return Gst.State.PLAYING in self.pipeline.get_state()
 
     def _get_rate(self):
         return self._rate
 
     def _set_rate(self, rate):
         self._rate = rate
-        seek_type = gst.SEEK_TYPE_SET
+        seek_type = Gst.SeekType.SET
         try:
-            pos = self.pipeline.query_position(gst.FORMAT_TIME, None)[0]
-        except gst.QueryError:
-            seek_type = gst.SEEK_TYPE_NONE
+            pos = self.pipeline.query_position(Gst.Format.TIME, None)[0]
+        except:
+            seek_type = Gst.SeekType.NONE
             pos = -1
         self.pipeline.seek(rate,
-                           gst.FORMAT_TIME,
-                           gst.SEEK_FLAG_FLUSH | gst.SEEK_FLAG_ACCURATE,
+                           Gst.Format.TIME,
+                           Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE,
                            seek_type, pos,
-                           gst.SEEK_TYPE_NONE, -1)
+                           Gst.SeekType.NONE, -1)
 
     rate = property(_get_rate, _set_rate)
 
@@ -151,24 +161,24 @@ class gTranscribePlayer(gobject.GObject):
             self.emit('ready', self.audiosrc.get_property('location'))
 
     def on_message(self, bus, message):
-        if message.type == gst.MESSAGE_EOS:
-            self.pipeline.set_state(gst.STATE_NULL)
+        if message.type == Gst.MessageType.EOS:
+            self.pipeline.set_state(Gst.State.NULL)
             self.emit('ended')
 
     def open(self, filepath):
         logger.debug('Opening file "%s"' % filepath)
-        self.pipeline.set_state(gst.STATE_NULL)
+        self.pipeline.set_state(Gst.State.NULL)
         self.audiosrc.set_property('location', filepath)
         # Force decoding of file so we have a duration
-        self.pipeline.set_state(gst.STATE_PLAYING)
-        self.pipeline.set_state(gst.STATE_PAUSED)
+        self.pipeline.set_state(Gst.State.PLAYING)
+        self.pipeline.set_state(Gst.State.PAUSED)
         self._duration = None
 
     def play(self):
         """Start playback from current position."""
-        self.pipeline.set_state(gst.STATE_PLAYING)
+        self.pipeline.set_state(Gst.State.PLAYING)
         
     def pause(self):
         """Pause playback."""
-        self.pipeline.set_state(gst.STATE_PAUSED)
+        self.pipeline.set_state(Gst.State.PAUSED)
 

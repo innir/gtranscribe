@@ -15,12 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sqlite3
-import glib
+from gi.repository import GLib
 import os.path
 import logging
 logger = logging.getLogger('fileinfo')
 
-database = os.path.join(glib.get_user_cache_dir(), "gTranscribe","metadata.db")
+database = os.path.join(GLib.get_user_cache_dir(), "gTranscribe","metadata.db")
 
 class FileInfo (object):
     """
