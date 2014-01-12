@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # gTranscribe is a software focussed on easy transcription of spoken words.
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
-# Copyright (C) 2013 Philip Rinn <rinni@gmx.net>
+# Copyright (C) 2013-2014 Philip Rinn <rinni@inventati.org>
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3 as 
@@ -20,7 +20,7 @@ import os
 import glib
 import sqlite3
 import gi
-from gi.repository import GObject, Gtk, GtkSpell
+from gi.repository import GObject, Gtk, Gdk, GtkSpell
 GObject.threads_init()
 import re
 import logging
@@ -51,7 +51,7 @@ if python_path:
 from gtranscribe import SkiptoDialog
 from gtranscribe import AboutDialog
 from gtranscribe.helpers import *
-from gtranscribe.player import gTranscribePlayer QueryError
+from gtranscribe.player import gTranscribePlayer #, QueryError
 from gtranscribe.fileinfo import FileInfo
 
 class gTranscribeWindow:
@@ -59,8 +59,9 @@ class gTranscribeWindow:
     def __init__(self):
         builder = Gtk.Builder()
         builder.set_translation_domain('gTranscribe')
-        builder.add_from_file(get_data_file('ui', 'gTranscribeWindow.ui'))
+        builder.add_from_file(get_data_file('ui', 'gTranscribe.glade'))
         builder.connect_signals(self)
+        self.play_action = builder.get_object("action_play")
 
         self.window = builder.get_object("gtranscribe_window")
         self.text_view = builder.get_object("text_view")
@@ -72,64 +73,7 @@ class gTranscribeWindow:
         self.spinbutton_jump.set_range(0, 5000)
         self.spinbutton_jump.set_increments(10, 100)
 
-        actions = Gtk.ActionGroup('Actions')
-        actions.add_actions((('menu_file', None, _('_File')),
-                             ('menu_playback', None, _('_Playback')),
-                             ('menu_help', None, _('_Help')),
-                             
-                             ('open', Gtk.STOCK_OPEN, None,
-                             '<Ctrl>o', None, self.open),
-                             ('open_text', Gtk.STOCK_OPEN, _('Open Text'),
-                             '<Ctrl>t', None, self.on_open_menu_item_activate),
-                             ('save', Gtk.STOCK_SAVE, None,
-                             '<Ctrl>s', None, self.on_save_menu_item_activate),
-                             ('quit', Gtk.STOCK_QUIT, None,
-                              '<Ctrl>q', None, self.quit),
-                              
-                             ('slower', None, _('Slower'),
-                              '<Ctrl>d', None, self.change_speed),
-                             ('faster', None, _('Faster'),
-                              '<Ctrl>f', None, self.change_speed),
-                             ('forward', Gtk.STOCK_MEDIA_FORWARD, None,
-                              '<Ctrl>Right', None, self.forward),
-                             ('rewind', Gtk.STOCK_MEDIA_REWIND, None,
-                              '<Ctrl>Left', None, self.rewind),
-                             ('skip', None, _('Skip to ...'),
-                              '<Ctrl>k', None, self.skip_to),
-                              
-                             ('about', Gtk.STOCK_ABOUT, None,
-                              None, None, self.about)
-                             ))
-        self.play_action = Gtk.ToggleAction('play', None, None,
-                                            Gtk.STOCK_MEDIA_PLAY)
-        self.play_action.connect_proxy(builder.get_object('button_play'))
-        self.play_action.connect('activate', self.play)
-        actions.add_action_with_accel(self.play_action, '<Ctrl>space')
-        self.forward_action = actions.get_action('forward')
-        self.forward_action.connect_proxy(
-                builder.get_object('button_seek_forward'))
-        self.rewind_action = actions.get_action('rewind')
-        self.rewind_action.connect_proxy(
-                builder.get_object('button_seek_back'))
-
-        recent_action = Gtk.RecentAction('open_recent', _('_Recent files'),
-                                         None, None)
-        recent_filter = Gtk.RecentFilter()
-        recent_filter.add_mime_type('audio/*,text/plain')
-        recent_action.add_filter(recent_filter)
-        recent_action.set_filter(recent_filter)
-        recent_action.set_sort_type(Gtk.RecentSortType.MRU)
-        recent_action.connect('item-activated', self.open_recent)
-        actions.add_action(recent_action)
-
-        self.ui = Gtk.UIManager()
-        self.window.add_accel_group(self.ui.get_accel_group())
-        self.ui.insert_action_group(actions)
-        self.ui.add_ui_from_file(get_data_file('ui', 'gTranscribeMenu.ui'))
-        vbox = builder.get_object('vbox1')
-        menubar = self.ui.get_widget('/menubar_main')
-        vbox.pack_start(menubar, False, True, 0)
-        vbox.reorder_child(menubar, 0)
+        recent_action = builder.get_object("recent_action")
 
         # Code for other initialization actions should be added here.
         self.player = gTranscribePlayer()
@@ -335,12 +279,12 @@ class gTranscribeWindow:
     def play_loop(self, once=False):
         try:
             self.position = self.player.position
-        except QueryError:
+        except:
             logging.warn("query failed, can't get current position")
             return False
         try:
             duration = self.player.duration
-        except QueryError:
+        except:
             logging.warn("query failed, can't get file duration")
             return False
         self.set_position_label(duration)
@@ -356,11 +300,11 @@ class gTranscribeWindow:
         pos_str = trim(ns_to_time(self.position).strftime(self.time_str))
         self.pos_label.set_text(pos_str)
 
-    def change_speed(self, action):
-        if action.get_name() == 'slower':
-            self.speedscale.set_value(self.speedscale.get_value() - 0.1)
-        else:
-            self.speedscale.set_value(self.speedscale.get_value() + 0.1)
+    def dec_speed(self, action):
+        self.speedscale.set_value(self.speedscale.get_value() - 0.1)
+
+    def inc_speed(self, action):
+        self.speedscale.set_value(self.speedscale.get_value() + 0.1)
 
     def forward(self, action):
         new_position = self.position + time_to_ns(self.SEEK_INTERVAL)

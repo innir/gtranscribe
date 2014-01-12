@@ -1,6 +1,6 @@
 # gTranscribe is a software focussed on easy transcription of spoken words.
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
-# Copyright (C) 2013 Philip Rinn <rinni@gmx.net>
+# Copyright (C) 2013-2014 Philip Rinn <rinni@inventati.org>
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3 as 
@@ -22,15 +22,15 @@ gettext.textdomain('gTranscribe')
 class AboutDialog:
 
     def __init__(self, trans):
-        authors = ["Philip Rinn <rinni@gmx.net>"]
+        authors = ["Philip Rinn <rinni@inventati.org>"]
         self.about_dialog = Gtk.AboutDialog()
         self.about_dialog.set_transient_for(trans.window)
         self.about_dialog.set_destroy_with_parent(True)
         self.about_dialog.set_name("gTranscribe")
         self.about_dialog.set_version("0.2")
-        self.about_dialog.set_copyright("Copyright \xc2\xa9 2010 Frederik Elwert\nCopyright \xc2\xa9 2013 Philip Rinn")
+        self.about_dialog.set_copyright("Copyright \xc2\xa9 2010 Frederik Elwert\nCopyright \xc2\xa9 2013-2014 Philip Rinn")
         self.about_dialog.set_comments(_("gTranscribe is a software focussed on easy transcription of spoken words."))
-        self.about_dialog.set_website("https://gtranscribe.googlecode.com")
+        self.about_dialog.set_website("https://github.com/innir/gtranscribe")
         self.about_dialog.set_authors(authors)
         self.about_dialog.set_license("This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License version 3 as\npublished by the Free Software Foundation.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses/.")
 
