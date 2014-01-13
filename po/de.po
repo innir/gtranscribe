@@ -1,17 +1,83 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: gTranscribe 0.1\n"
+"Project-Id-Version: gTranscribe 0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-04-08 20:19+0200\n"
 "PO-Revision-Date: \n"
-"Last-Translator: \n"
+"Last-Translator: Philip Rinn <rinni@inventati.org>\n"
 "Language-Team: \n"
-"Language: \n"
+"Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: German\n"
-"X-Poedit-Country: GERMANY\n"
+"X-Generator: Poedit 1.5.4\n"
+
+#: ../gtranscribe.desktop.in:3
+msgid "gTranscribe audio player"
+msgstr "gTranscribe Audio-Player"
+
+#: ../bin/gtranscribe:170
+msgid "Open Audio File"
+msgstr "Audio-Datei öffnen"
+
+#: ../bin/gtranscribe:175
+msgid "All Audio Files"
+msgstr "Alle Audio-Dateien"
+
+#: ../bin/gtranscribe:459
+msgid "Show debug messages"
+msgstr "Diagnosemeldungen anzeigen"
+
+#: ../data/ui/gTranscribe.glade:55
+msgid "_File"
+msgstr "_Datei"
+
+#: ../data/ui/gTranscribe.glade:74
+msgid "Open Text"
+msgstr "Öffne Text"
+
+#: ../data/ui/gTranscribe.glade:119
+msgid "_Playback"
+msgstr "_Wiedergabe"
+
+#: ../data/ui/gTranscribe.glade:139
+msgid "Slower"
+msgstr "Langsamer"
+
+#: ../data/ui/gTranscribe.glade:151
+msgid "Faster"
+msgstr "Schneller"
+
+#: ../data/ui/gTranscribe.glade:191
+msgid "_Help"
+msgstr "_Hilfe"
+
+#: ../data/ui/gTranscribe.glade:229 ../data/ui/gTranscribe.glade:300
+msgid "00:00.0"
+msgstr "00:00.0"
+
+#: ../data/ui/gTranscribe.glade:365
+msgid "Change playback speed"
+msgstr "Wiedergabegeschwindigkeit ändern"
+
+#: ../data/ui/gTranscribe.glade:399
+msgid "Resume interval:"
+msgstr "Rücksprung-Intervall:"
+
+#: ../data/ui/gTranscribe.glade:413
+msgid "Change the time to jump back on resume in ms"
+msgstr "Zeit die nach dem Fortsetzen zurück gesprungen wird in ms"
+
+#: ../data/ui/gTranscribe.glade:427
+msgid "ms"
+msgstr "ms"
+
+#: ../gtranscribe/AboutDialog.py:32
+msgid ""
+"gTranscribe is a software focussed on easy transcription of spoken words."
+msgstr ""
+"gTranscribe ist ein Programm, das auf einfaches Transkribieren von "
+"gesprochenen Wörtern fokussiert ist."
 
 #: ../gtranscribe/helpers.py:96
 msgid "Open File..."
@@ -24,86 +90,3 @@ msgstr "Einfache Textdateien"
 #: ../gtranscribe/helpers.py:113
 msgid "Save File..."
 msgstr "Datei speichern..."
-
-#: ../gtranscribe/SkiptoDialog.py:30
-msgid "Skip to:"
-msgstr "Springe zu:"
-
-#: ../gtranscribe/SkiptoDialog.py:32
-#: ../bin/gtranscribe.py:95
-msgid "Skip to ..."
-msgstr "Springe zu …"
-
-#: ../bin/gtranscribe.py:74
-msgid "_File"
-msgstr "_Datei"
-
-#: ../bin/gtranscribe.py:75
-msgid "_Playback"
-msgstr "_Wiedergabe"
-
-#: ../bin/gtranscribe.py:76
-msgid "_Help"
-msgstr "_Hilfe"
-
-#: ../bin/gtranscribe.py:80
-msgid "Open Text"
-msgstr "Öffne Text"
-
-#: ../bin/gtranscribe.py:87
-msgid "Slower"
-msgstr "Langsamer"
-
-#: ../bin/gtranscribe.py:89
-msgid "Faster"
-msgstr "Schneller"
-
-#: ../bin/gtranscribe.py:113
-msgid "_Recent files"
-msgstr "Zuletzt geöffnete Dateien"
-
-#: ../bin/gtranscribe.py:213
-msgid "Open Audio File"
-msgstr "Audio-Datei öffnen"
-
-#: ../bin/gtranscribe.py:218
-msgid "All Audio Files"
-msgstr "Alle Audio-Dateien"
-
-#: ../bin/gtranscribe.py:516
-msgid "Show debug messages"
-msgstr "Diagnosemeldungen anzeigen"
-
-#: ../gtranscribe.desktop.in.h:1
-#: ../data/ui/gTranscribeWindow.ui.h:1
-msgid "gTranscribe"
-msgstr "gTranscribe"
-
-#: ../gtranscribe.desktop.in.h:2
-msgid "gTranscribe audio player"
-msgstr "gTranscribe Audio-Player"
-
-#: ../gtranscribe/AboutDialog.py:33
-msgid "gTranscribe is a software focussed on easy transcription of spoken words."
-msgstr "gTranscribe ist ein Programm, das auf einfaches Transkribieren von gesprochenen Wörtern fokussiert ist."
-
-#: ../data/ui/gTranscribeWindow.ui.h:2
-msgid "00:00.000"
-msgstr "00:00.000"
-
-#: ../data/ui/gTranscribeWindow.ui.h:3
-msgid "Change playback speed"
-msgstr "Wiedergabegeschwindigkeit ändern"
-
-#: ../data/ui/gTranscribeWindow.ui.h:4
-msgid "Resume interval:"
-msgstr "Rücksprung-Intervall:"
-
-#: ../data/ui/gTranscribeWindow.ui.h:5
-msgid "Change the time to jump back on resume in ms"
-msgstr "Zeit die nach dem Fortsetzen zurück gesprungen wird in ms"
-
-#: ../data/ui/gTranscribeWindow.ui.h:6
-msgid "ms"
-msgstr "ms"
-

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # gTranscribe is a software focussed on easy transcription of spoken words.
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
-# Copyright (C) 2013 Philip Rinn <rinni@gmx.net>
+# Copyright (C) 2013-2014 Philip Rinn <rinni@inventati.org>
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3 as 
@@ -20,11 +20,11 @@ assert DistUtilsExtra.auto.__version__ >= '2.18', 'gTranscribe needs DistUtilsEx
 
 DistUtilsExtra.auto.setup(
     name='gTranscribe',
-    version='0.2',
+    version='0.3',
     license='GPL-3',
     author='Philip Rinn',
-    author_email='rinni@gmx.net',
+    author_email='rinni@inventati.org',
     description='gTranscribe',
     long_description='gTranscribe is a software focussed on easy transcription of spoken words.',
-    url='https://gtranscribe.googlecode.com'
+    url='https://github.com/innir/gtranscribe'
     )

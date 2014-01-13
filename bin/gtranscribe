@@ -48,7 +48,6 @@ if (os.path.exists(os.path.join(PROJECT_ROOT_DIRECTORY, 'gtranscribe'))
 if python_path:
     os.putenv('PYTHONPATH', "%s:%s" % (os.getenv('PYTHONPATH', ''), ':'.join(python_path)))
 
-from gtranscribe import SkiptoDialog
 from gtranscribe import AboutDialog
 from gtranscribe.helpers import *
 from gtranscribe.player import gTranscribePlayer #, QueryError
@@ -61,31 +60,23 @@ class gTranscribeWindow:
         builder.set_translation_domain('gTranscribe')
         builder.add_from_file(get_data_file('ui', 'gTranscribe.glade'))
         builder.connect_signals(self)
-        self.play_action = builder.get_object("action_play")
-
         self.window = builder.get_object("gtranscribe_window")
+
         self.text_view = builder.get_object("text_view")
         spellchecker = GtkSpell.Checker()
         spellchecker.set_language(locale.getdefaultlocale()[0])
         spellchecker.attach(self.text_view)
-        self.icon_play = builder.get_object("icon_play")
+
         self.spinbutton_jump = builder.get_object("spinbutton_jump")
         self.spinbutton_jump.set_range(0, 5000)
         self.spinbutton_jump.set_increments(10, 100)
 
-        recent_action = builder.get_object("recent_action")
-
-        # Code for other initialization actions should be added here.
-        self.player = gTranscribePlayer()
-        self.player.connect('ready', self.on_file_ready)
-        self.player.connect('ended', self.on_file_ended)
-
-        self.recent_manager = Gtk.RecentManager.get_default()
-
         self.speedscale = builder.get_object('scale_speed')
         self.speedscale.set_value(1)
+
+        self.play_action = builder.get_object("action_play")
         self.slider = builder.get_object('scale_position')
-        self.seekscale = builder.get_object('scale_seek')
+        self.icon_play = builder.get_object("icon_play")
 
         self.dur_label = builder.get_object('label_duration')
         self.pos_label = builder.get_object('label_position')
@@ -141,6 +132,11 @@ class gTranscribeWindow:
             # Open a file passed as commandline parameter.
             # Use idle_add so window is settled.
             GObject.idle_add(self.open_file, filepath)
+
+        # Code for other initialization actions should be added here.
+        self.player = gTranscribePlayer()
+        self.player.connect('ready', self.on_file_ready)
+        self.player.connect('ended', self.on_file_ended)
             
     def _get_update_ui(self):
         return self._update_id is not None
@@ -193,7 +189,6 @@ class gTranscribeWindow:
     def open_file(self, filepath):
         self.play_action.set_active(False)
         self.slider.set_value(0)
-        self.recent_manager.add_item(filepath_to_uri(filepath))
         self.md5 = md5_of_file(filepath)
         # insert md5 into database so we can just update afterwards
         con = sqlite3.connect(os.path.join(self.cache_dir,"metadata.db"))
@@ -325,19 +320,6 @@ class gTranscribeWindow:
         clipboard = Gtk.clipboard_get()
         clipboard.set_text(self.TIMESTAMP_FORMAT % pos_str)
 
-    def skip_to(self, action):
-        skip_dlg = SkiptoDialog.SkiptoDialog()
-        skip_dlg.time_format = self.time_str
-        skip_dlg.spinbutton.set_range(0, self.player.duration)
-        page = time_to_ns(datetime.time(second=1))
-        skip_dlg.spinbutton.set_increments(page / 10, page)
-        skip_dlg.spinbutton.set_value(self.position)
-        response = skip_dlg.run()
-        if response == Gtk.ResponseType.OK:
-            self.player.position = int(skip_dlg.spinbutton.get_value())
-            GObject.idle_add(self.play_loop, True)
-        skip_dlg.destroy()
-
     def on_scale_speed_format_value(self, widget, value, data=None):
         return u'%s\xd7' % locale.format('%.1f', value)
 
@@ -372,16 +354,6 @@ class gTranscribeWindow:
         if not self.player.playing:
             self.window.update_ui = False
             self._set_update_ui(False)
-
-    def seek_loop(self):
-        scalevalue = self.seekscale.get_value()
-        if scalevalue != 0:
-            seekvalue = (abs(scalevalue) + 0.75) ** 2
-            if scalevalue < 0:
-                seekvalue *= -1
-            oldpos = self.position
-            self.player.position = oldpos + seekvalue * 100000000
-        return self.exact_seeking
 
     def on_volumebutton_value_changed(self, scalebutton, value):
         self.player.volume = value
