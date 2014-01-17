@@ -1,14 +1,20 @@
 Source: gtranscribe
 Section: python
 Priority: optional
-Build-Depends: debhelper (>= 9), python (>= 2.6.6-3~), python-distutils-extra (>= 2.18)
-Maintainer: Philip Rinn <rinni@gmx.net>
-Homepage: https://gtranscribe.googlecode.com
-Standards-Version: 3.9.4
+Build-Depends: debhelper (>= 9),
+               python (>= 2.7),
+               python-distutils-extra (>= 2.18)
+Maintainer: Philip Rinn <rinni@inventati.org>
+Homepage: https://github.com/innir/gtranscribe
+Standards-Version: 3.9.5
 
 Package: gtranscribe
 Architecture: all
-Depends: ${misc:Depends}, python (>= 2.6.6-3~), python (<< 2.8), python-dbus, python-gobject-2 | python-gobject (<< 3), python-gst0.10, python-gtk2, python-pysqlite2, python-gtkspell, gstreamer0.10-plugins-bad
+Depends: ${python:Depends}, ${misc:Depends}, python-gi, python-gtkspellcheck,
+         python-dbus, python-pysqlite2, gir1.2-gtk-3.0, gir1.2-glib-2.0,
+         gir1.2-gstreamer-1.0, gir1.2-gst-plugins-base-1.0,
+         gstreamer1.0-plugins-bad
+
 Description: Software focussed on easy transcription of spoken words.
  An audio player designed to make the transcription of interviews and other 
  sources as easy as possible.
