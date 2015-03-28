@@ -420,7 +420,7 @@ class gTranscribeWindow:
             # disable text view while getting contents of buffer
             buff = self.text_view.get_buffer()
             self.text_view.set_sensitive(False)
-            text = buff.get_text(buff.get_start_iter(), buff.get_end_iter())
+            text = buff.get_text(buff.get_start_iter(), buff.get_end_iter(), True)
             self.text_view.set_sensitive(True)
             buff.set_modified(False)
             fout = open(self.filename, "w")
