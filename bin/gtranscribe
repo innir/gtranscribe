@@ -17,10 +17,9 @@
 
 import sys
 import os
-import glib
 import sqlite3
 import gi
-from gi.repository import GObject, Gtk, Gdk, GtkSpell
+from gi.repository import GLib, GObject, Gtk, Gdk, GtkSpell
 GObject.threads_init()
 import re
 import logging
@@ -116,7 +115,7 @@ class gTranscribeWindow:
             self.window.connect('focus-in-event', self.on_focus)
 
         #make sure our cache directory exists
-        self.cache_dir = os.path.join(glib.get_user_cache_dir(), "gTranscribe")
+        self.cache_dir = os.path.join(GLib.get_user_cache_dir(), "gTranscribe")
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
 
