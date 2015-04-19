@@ -1,6 +1,6 @@
 # gTranscribe is a software focussed on easy transcription of spoken words.
+# Copyright (C) 2013-2015 Philip Rinn <rinni@inventati.org>
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
-# Copyright (C) 2013-2014 Philip Rinn <rinni@inventati.org>
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3 as 
@@ -28,7 +28,7 @@ class AboutDialog:
         self.about_dialog.set_destroy_with_parent(True)
         self.about_dialog.set_name("gTranscribe")
         self.about_dialog.set_version("0.3")
-        self.about_dialog.set_copyright("Copyright \xc2\xa9 2010 Frederik Elwert\nCopyright \xc2\xa9 2013-2014 Philip Rinn")
+        self.about_dialog.set_copyright("Copyright \xc2\xa9 2013-2015 Philip Rinn\nCopyright \xc2\xa9 2010 Frederik Elwert")
         self.about_dialog.set_comments(_("gTranscribe is a software focussed on easy transcription of spoken words."))
         self.about_dialog.set_website("https://github.com/innir/gtranscribe")
         self.about_dialog.set_authors(authors)
