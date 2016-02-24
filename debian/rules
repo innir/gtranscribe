@@ -1,9 +1,0 @@
-#!/usr/bin/make -f
-
-%:
-	dh $@ --with python2
-
-override_dh_install:
-	dh_install
-	# remove README as it's installed in the wrong directory
-	rm -rf $(CURDIR)/debian/gtranscribe/usr/share/doc/gTranscribe
