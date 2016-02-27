@@ -20,6 +20,7 @@ import datetime
 from gi.repository import Gtk, Gio
 import hashlib
 import gettext
+import logging
 from gettext import gettext as _
 gettext.textdomain('gTranscribe')
 
@@ -56,13 +57,13 @@ def ns_to_time(ns):
         - A datetime.time object.
         
     """
-    h = ns / (60 * 60 * 1000000000)
+    h = ns // (60 * 60 * 1000000000)
     mod = ns % (60 * 60 * 1000000000)
-    m = mod / (60 * 1000000000)
+    m = mod // (60 * 1000000000)
     mod = mod % (60 * 1000000000)
-    s = mod / 1000000000
+    s = mod // 1000000000
     mod = mod % 1000000000
-    ms = mod / 1000
+    ms = mod // 1000
     return datetime.time(h, m, s, ms)
     
 def time_to_ns(time):
@@ -128,7 +129,7 @@ def error_message(self, message):
 
 def md5_of_file(fname):
     md5 = hashlib.md5()
-    f = open(fname, 'r')
+    f = open(fname, 'rb')
     while True:
         data = f.read(81920)
         if not data:

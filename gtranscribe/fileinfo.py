@@ -72,7 +72,7 @@ class FileInfo (object):
 
     def _get_position(self):
         position = self._get_data("position")
-        if not isinstance(position, (int, long)):
+        if not isinstance(position, (int)):
             position = 0
         return position
 
