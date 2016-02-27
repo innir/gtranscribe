@@ -16,11 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import DistUtilsExtra.auto
-assert DistUtilsExtra.auto.__version__ >= '2.18', 'gTranscribe needs DistUtilsExtra.auto >= 2.18'
+assert DistUtilsExtra.auto.__version__ >= '2.22', 'gTranscribe needs DistUtilsExtra.auto >= 2.22'
 
 DistUtilsExtra.auto.setup(
     name='gTranscribe',
-    version='0.3',
+    version='0.4',
     license='GPL-3',
     author='Philip Rinn',
     author_email='rinni@inventati.org',

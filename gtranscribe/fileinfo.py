@@ -1,5 +1,5 @@
 # gTranscribe is a software focussed on easy transcription of spoken words.
-# Copyright (C) 2013-2014 Philip Rinn <rinni@inventati.org>
+# Copyright (C) 2013-2016 Philip Rinn <rinni@inventati.org>
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
 # 
 # This program is free software: you can redistribute it and/or modify
