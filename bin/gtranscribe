@@ -268,8 +268,9 @@ class gTranscribeWindow:
                     newpos = 0
                 self.player.position = newpos
                 GObject.idle_add(self.play_loop, True)
-            fileinfo = FileInfo(self.player.filename, self.md5)
-            fileinfo.position = self.position
+            if hasattr(self, 'md5'):
+                fileinfo = FileInfo(self.player.filename, self.md5)
+                fileinfo.position = self.position
 
     def play_loop(self, once=False):
         try:
@@ -289,11 +290,12 @@ class gTranscribeWindow:
             return True
 
     def set_position_label(self, duration):
-        frac = float(self.position) / float(duration)
-        scalepos = frac * self.slider.get_adjustment().get_upper()
-        self.slider.set_value(scalepos)
-        pos_str = trim(ns_to_time(self.position).strftime(self.time_str))
-        self.pos_label.set_text(pos_str)
+        if duration > 0:
+            frac = float(self.position) / float(duration)
+            scalepos = frac * self.slider.get_adjustment().get_upper()
+            self.slider.set_value(scalepos)
+            pos_str = trim(ns_to_time(self.position).strftime(self.time_str))
+            self.pos_label.set_text(pos_str)
 
     def dec_speed(self, action):
         self.speedscale.set_value(self.speedscale.get_value() - 0.1)
@@ -325,7 +327,7 @@ class gTranscribeWindow:
 
     def on_scale_speed_value_changed(self, range):
         value = range.get_value()
-        if value != self.player.rate:
+        if (value != self.player.rate) and hasattr(self, 'md5'):
             self.player.rate = value
             fileinfo = FileInfo(self.player.filename, self.md5)
             fileinfo.speed = value
