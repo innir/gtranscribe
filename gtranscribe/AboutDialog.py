@@ -1,23 +1,26 @@
 # gTranscribe is a software focussed on easy transcription of spoken words.
 # Copyright (C) 2013-2016 Philip Rinn <rinni@inventati.org>
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as 
+# it under the terms of the GNU General Public License version 3 as
 # published by the Free Software Foundation.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
 import gettext
 from gettext import gettext as _
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 gettext.textdomain('gTranscribe')
+
 
 class AboutDialog:
 
@@ -49,8 +52,7 @@ class AboutDialog:
     def _close(self, dialog, response, trans):
         trans.about_dialog = None
         dialog.destroy()
-        
+
     def _delete_event(self, dialog, event, trans):
         trans.about_dialog = None
         return True
-

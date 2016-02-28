@@ -1,28 +1,26 @@
 # gTranscribe is a software focussed on easy transcription of spoken words.
 # Copyright (C) 2013-2014 Philip Rinn <rinni@inventati.org>
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as 
+# it under the terms of the GNU General Public License version 3 as
 # published by the Free Software Foundation.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-logger = logging.getLogger('player')
 import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst, GObject
+logger = logging.getLogger('player')
 GObject.threads_init()
 Gst.init(None)
-
-#QueryError = Gst.QueryError # for imports in GUI
 
 
 class gTranscribePlayer(Gst.Bin):
@@ -85,7 +83,7 @@ class gTranscribePlayer(Gst.Bin):
     @property
     def duration(self):
         """Return the duration of the current stream."""
-        if self._duration == None:
+        if self._duration is None:
             self._duration = self.pipeline.query_duration(Gst.Format.TIME)[1]
             logger.debug('Duration is: "%s"' % self._duration)
         return self._duration
@@ -147,10 +145,9 @@ class gTranscribePlayer(Gst.Bin):
     def on_new_decoded_pad(self, element, pad):
         """
         Handle new decoded pad from decodebin.
-        
+
         decodebin creates a new pad after decoding the stream, so we
         have to wait with linking until decodebin has the new pad.
-        
         """
         caps = pad.query_caps(None).to_string()
         if caps.startswith('audio/'):
@@ -175,8 +172,7 @@ class gTranscribePlayer(Gst.Bin):
     def play(self):
         """Start playback from current position."""
         self.state = Gst.State.PLAYING
-        
+
     def pause(self):
         """Pause playback."""
         self.state = Gst.State.PAUSED
-
