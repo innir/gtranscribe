@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application>
+  <id type="desktop">gtranscribe.desktop</id>
+  <metadata_license>CCO</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <developer_name>Philip Rinn</developer_name>
+  <name>gTranscribe</name>
+  <summary>
+    A simple GTK+ tool focussed on easy transcription of spoken words
+  </summary>
+  <description>
+    <p>
+      gTranscribe is a simple GTK+ tool to transcribe audio files and other
+      sources. The playback speed can be adjusted without changing the pitch
+      of the voice. It supports spell checking and resuming at the last
+      transcribed position.
+     </p>
+  </description>
+  <keywords>
+    <keyword>raw</keyword>
+    <keyword>photography</keyword>
+    <keyword>develop</keyword>
+    <keyword>pp3</keyword>
+    <keyword>graphics</keyword>
+  </keywords>
+  <provides>
+​    <binary>gtranscribe</binary>
+​  </provides>
+  <releases>
+    <release version="0.4" date="2016-02-27" />
+​  </releases>
+  <url type="homepage">https://github.com/innir/gtranscribe</url>
+  <url type="bugtracker">https://github.com/innir/gtranscribe/issues</url>
+  <update_contact>rinni@inventati.org</update_contact>
+</application>
