@@ -137,9 +137,6 @@ class gTranscribeWindow:
             # Open a file passed as commandline parameter.
             # Use idle_add so window is settled.
             GObject.idle_add(self.open_file, filepath)
-            # It's not resuming at the correct position if we don't set the
-            # position explicitly
-            self.player.position = self.position
 
     def _get_update_ui(self):
         return self._update_id is not None
@@ -256,6 +253,9 @@ class gTranscribeWindow:
         logging.debug('play action triggered')
         if action.get_active():
             self.icon_play.set_from_stock(Gtk.STOCK_MEDIA_PAUSE, 2)
+            # It's not resuming at the correct position if we don't set the
+            # position explicitly
+            self.player.position = self.position
             self.player.play()
             self.window.update_ui = True
             self._set_update_ui(True)
