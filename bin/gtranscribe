@@ -128,15 +128,18 @@ class gTranscribeWindow:
         cur.close()
         con.close()
 
-        if filepath:
-            # Open a file passed as commandline parameter.
-            # Use idle_add so window is settled.
-            GObject.idle_add(self.open_file, filepath)
-
         # Code for other initialization actions should be added here.
         self.player = gTranscribePlayer()
         self.player.connect('ready', self.on_file_ready)
         self.player.connect('ended', self.on_file_ended)
+
+        if filepath:
+            # Open a file passed as commandline parameter.
+            # Use idle_add so window is settled.
+            GObject.idle_add(self.open_file, filepath)
+            # It's not resuming at the correct position if we don't set the
+            # position explicitly
+            self.player.position = self.position
 
     def _get_update_ui(self):
         return self._update_id is not None
