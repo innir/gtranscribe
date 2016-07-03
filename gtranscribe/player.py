@@ -159,23 +159,24 @@ class gTranscribePlayer(Gst.Bin):
         if message.type == Gst.MessageType.EOS:
             self.state = Gst.State.NULL
             self.emit('ended')
+        elif message.type == Gst.MessageType.ERROR:
+            logger.debug("%s" % print(message.parse_error()))
+            self.state = Gst.State.NULL
 
     def open(self, filepath):
         logger.debug('Opening file "%s"' % filepath)
-        self.state = Gst.State.NULL
+        self.reset()
         self.audiosrc.set_property('location', filepath)
+        self._duration = None
         # Force decoding of file so we have a duration
         self.state = Gst.State.PLAYING
         self.state = Gst.State.PAUSED
-        self._duration = None
 
-    def close(self):
-        logger.debug('Close file')
+    def reset(self):
+        """Reset the pipeline."""
+        logger.debug('Reset the pipeline')
         self.state = Gst.State.NULL
-        self.audiosrc.set_property('location', '')
-        self.state = Gst.State.PLAYING
-        self.state = Gst.State.PAUSED
-        self._duration = None
+        self.state = Gst.State.READY
 
     def play(self):
         """Start playback from current position."""
