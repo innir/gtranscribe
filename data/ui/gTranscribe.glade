@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.20.0 -->
 <interface>
-  <!-- interface-requires gtk+ 3.0 -->
+  <requires lib="gtk+" version="3.0"/>
   <object class="GtkToggleAction" id="action_play">
     <signal name="toggled" handler="play" swapped="no"/>
   </object>
@@ -33,10 +34,11 @@
   </object>
   <object class="GtkWindow" id="gtranscribe_window">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">gTranscribe</property>
     <property name="default_width">450</property>
     <property name="default_height">550</property>
-    <signal name="destroy" handler="quit" swapped="no"/>
     <signal name="delete-event" handler="quit" swapped="no"/>
+    <signal name="destroy" handler="quit" swapped="no"/>
     <child>
       <object class="GtkBox" id="window">
         <property name="visible">True</property>
@@ -65,8 +67,8 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <accelerator key="o" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="open" swapped="no"/>
+                        <accelerator key="o" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -87,8 +89,8 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <accelerator key="s" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="on_save_menu_item_activate" swapped="no"/>
+                        <accelerator key="s" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -104,8 +106,8 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <accelerator key="q" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="quit" swapped="no"/>
+                        <accelerator key="q" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                   </object>
@@ -142,8 +144,8 @@
                         <property name="use_underline">True</property>
                         <property name="image">image4</property>
                         <property name="use_stock">False</property>
-                        <accelerator key="d" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="dec_speed" swapped="no"/>
+                        <accelerator key="d" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -154,8 +156,8 @@
                         <property name="use_underline">True</property>
                         <property name="image">image5</property>
                         <property name="use_stock">False</property>
-                        <accelerator key="f" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="inc_speed" swapped="no"/>
+                        <accelerator key="f" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -165,8 +167,8 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <accelerator key="Right" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="forward" swapped="no"/>
+                        <accelerator key="Right" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -176,8 +178,8 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <accelerator key="Left" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="rewind" swapped="no"/>
+                        <accelerator key="Left" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                   </object>
@@ -327,7 +329,6 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
-                <accelerator key="space" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
                 <child>
                   <object class="GtkImage" id="icon_play">
                     <property name="visible">True</property>
@@ -335,6 +336,7 @@
                     <property name="stock">gtk-media-play</property>
                   </object>
                 </child>
+                <accelerator key="space" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -451,18 +453,29 @@
               <object class="GtkVolumeButton" id="volumebutton">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="focus_on_click">False</property>
                 <property name="receives_default">True</property>
                 <property name="has_tooltip">True</property>
                 <property name="relief">none</property>
-                <property name="focus_on_click">False</property>
                 <property name="orientation">vertical</property>
                 <property name="value">100</property>
                 <property name="icons">audio-volume-muted
 audio-volume-high
 audio-volume-low
 audio-volume-medium</property>
-                <property name="use_symbolic">True</property>
                 <signal name="value-changed" handler="on_volumebutton_value_changed" swapped="no"/>
+                <child internal-child="plus_button">
+                  <object class="GtkButton">
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
+                  </object>
+                </child>
+                <child internal-child="minus_button">
+                  <object class="GtkButton">
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>

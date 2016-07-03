@@ -30,15 +30,6 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSpell', '3.0')
 from gi.repository import GLib, GObject, Gtk, Gdk, GtkSpell
 from dbus.mainloop.glib import DBusGMainLoop
-from gtranscribe import AboutDialog
-from gtranscribe.helpers import *
-from gtranscribe.player import gTranscribePlayer
-from gtranscribe.fileinfo import FileInfo
-
-GObject.threads_init()
-locale.setlocale(locale.LC_ALL, '')
-gettext.textdomain('gTranscribe')
-DBusGMainLoop(set_as_default=True)
 
 # Add project root directory (enable symlink, and trunk execution).
 PROJECT_ROOT_DIRECTORY = os.path.abspath(
@@ -53,6 +44,15 @@ if python_path:
     os.putenv('PYTHONPATH', "%s:%s" % (os.getenv('PYTHONPATH', ''),
               ':'.join(python_path)))
 
+from gtranscribe import AboutDialog
+from gtranscribe.helpers import *
+from gtranscribe.player import gTranscribePlayer
+from gtranscribe.fileinfo import FileInfo
+
+GObject.threads_init()
+locale.setlocale(locale.LC_ALL, '')
+gettext.textdomain('gTranscribe')
+DBusGMainLoop(set_as_default=True)
 
 class gTranscribeWindow:
 
@@ -231,6 +231,10 @@ class gTranscribeWindow:
         logging.debug('received signal "ended"')
         self.window.update_ui = False
         self._set_update_ui(False)
+        self.player.position = 0
+        self.player.close()
+        self.window.set_title(u'gTranscribe')
+        self.dur_label.set_text('00:00.0')
         self.play_action.set_active(False)
 
     def on_media_key(self, application, key):

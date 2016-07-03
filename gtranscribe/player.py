@@ -169,6 +169,14 @@ class gTranscribePlayer(Gst.Bin):
         self.state = Gst.State.PAUSED
         self._duration = None
 
+    def close(self):
+        logger.debug('Close file')
+        self.state = Gst.State.NULL
+        self.audiosrc.set_property('location', '')
+        self.state = Gst.State.PLAYING
+        self.state = Gst.State.PAUSED
+        self._duration = None
+
     def play(self):
         """Start playback from current position."""
         self.state = Gst.State.PLAYING
