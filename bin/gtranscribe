@@ -120,7 +120,7 @@ class gTranscribeWindow:
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
 
-        # set up metadata database
+        # set up meta data database
         con = sqlite3.connect(os.path.join(self.cache_dir, "metadata.db"))
         cur = con.cursor()
         cur.execute('CREATE TABLE IF NOT EXISTS metadata(md5 TEXT PRIMARY KEY, position INTEGER, speed REAL)')
@@ -134,7 +134,7 @@ class gTranscribeWindow:
         self.player.connect('ended', self.on_file_ended)
 
         if filepath:
-            # Open a file passed as commandline parameter.
+            # Open a file passed as command-line parameter.
             # Use idle_add so window is settled.
             GObject.idle_add(self.open_file, filepath)
 
@@ -233,6 +233,9 @@ class gTranscribeWindow:
         self._set_update_ui(False)
         self.player.reset()
         self.play_action.set_active(False)
+        # Automatically save text if a filename is given to avoid data loss
+        if self.filename != None:
+            self.on_save_menu_item_activate(self.window)
 
     def on_media_key(self, application, key):
         logging.debug('Received media key %s for %s' % (key, application))
@@ -384,7 +387,7 @@ class gTranscribeWindow:
         self.SEEK_INTERVAL = self.JUMP_BACK_INTERVAL
 
     # Called when the user clicks the 'Open' menu. We need to prompt for save if
-    # thefile has been modified, allow the user to choose a file to open, and
+    # the file has been modified, allow the user to choose a file to open, and
     # then load it into the buffer for the GtkTextView.
     # The previous contents are overwritten.
     def on_open_menu_item_activate(self, menuitem, data=None):
