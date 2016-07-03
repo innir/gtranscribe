@@ -14,21 +14,20 @@
       sources. The playback speed can be adjusted without changing the pitch
       of the voice. It supports spell checking and resuming at the last
       transcribed position.
-     </p>
+    </p>
   </description>
   <keywords>
-    <keyword>raw</keyword>
-    <keyword>photography</keyword>
-    <keyword>develop</keyword>
-    <keyword>pp3</keyword>
-    <keyword>graphics</keyword>
+    <keyword>transcription</keyword>
+    <keyword>audio</keyword>
   </keywords>
   <provides>
-​    <binary>gtranscribe</binary>
-​  </provides>
+    <binary>gtranscribe</binary>
+  </provides>
   <releases>
     <release version="0.4" date="2016-02-27" />
-​  </releases>
+    <release version="0.5" date="2016-02-28" />
+    <release version="0.5.1" date="2016-07-03" />
+  </releases>
   <url type="homepage">https://github.com/innir/gtranscribe</url>
   <url type="bugtracker">https://github.com/innir/gtranscribe/issues</url>
   <update_contact>rinni@inventati.org</update_contact>
