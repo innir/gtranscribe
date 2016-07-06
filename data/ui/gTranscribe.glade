@@ -277,7 +277,6 @@
               <object class="GtkButton" id="button_seek_forward">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
                 <signal name="pressed" handler="forward" swapped="no"/>
