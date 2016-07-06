@@ -37,7 +37,10 @@ class gTranscribePlayer(Gst.Bin):
 
         self._rate = 1
         self._duration = None
+        self.init_pipeline()
 
+
+    def init_pipeline(self):
         self.pipeline = Gst.Pipeline()
         self.audiosrc = Gst.ElementFactory.make('filesrc', None)
         self.decoder = Gst.ElementFactory.make('decodebin', None)
@@ -153,7 +156,7 @@ class gTranscribePlayer(Gst.Bin):
         if caps.startswith('audio/'):
             if not self.apad.is_linked():
                 pad.link(self.apad)
-            self.emit('ready', self.audiosrc.get_property('location'))
+            self.emit('ready', self.filename)
 
     def on_message(self, bus, message):
         if message.type == Gst.MessageType.EOS:
@@ -163,11 +166,12 @@ class gTranscribePlayer(Gst.Bin):
             logger.debug("%s" % print(message.parse_error()))
             self.state = Gst.State.NULL
 
-    def open(self, filepath):
+    def open(self, filepath, duration = True):
         logger.debug('Opening file "%s"' % filepath)
-        self.reset()
+        self.state = Gst.State.READY
         self.audiosrc.set_property('location', filepath)
-        self._duration = None
+        if duration:
+            self._duration = None
         # Force decoding of file so we have a duration
         self.state = Gst.State.PLAYING
         self.state = Gst.State.PAUSED
@@ -176,7 +180,9 @@ class gTranscribePlayer(Gst.Bin):
         """Reset the pipeline."""
         logger.debug('Reset the pipeline')
         self.state = Gst.State.NULL
-        self.state = Gst.State.READY
+        filename = self.filename
+        self.init_pipeline()
+        self.open(filename, False)
 
     def play(self):
         """Start playback from current position."""

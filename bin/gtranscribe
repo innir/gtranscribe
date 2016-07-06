@@ -233,13 +233,11 @@ class gTranscribeWindow:
 
     def on_file_ended(self, signal):
         logging.debug('received signal "ended"')
-        self.window.update_ui = False
-        self._set_update_ui(False)
-        self.player.reset()
         self.play_action.set_active(False)
         # Automatically save text if a filename is given to avoid data loss
         if self.filename != None:
             self.on_save_menu_item_activate(self.window)
+        self.player.reset()
 
     def on_media_key(self, application, key):
         logging.debug('Received media key %s for %s' % (key, application))
