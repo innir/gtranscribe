@@ -30,7 +30,7 @@ class AboutDialog:
         self.about_dialog.set_transient_for(trans.window)
         self.about_dialog.set_destroy_with_parent(True)
         self.about_dialog.set_name("gTranscribe")
-        self.about_dialog.set_version("0.5.1")
+        self.about_dialog.set_version("0.5.2")
         self.about_dialog.set_copyright("Copyright \xc2\xa9 2013-2016 Philip Rinn\nCopyright \xc2\xa9 2010 Frederik Elwert")
         self.about_dialog.set_comments(_("gTranscribe is a software focussed on easy transcription of spoken words."))
         self.about_dialog.set_website("https://github.com/innir/gtranscribe")
