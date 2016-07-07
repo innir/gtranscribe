@@ -242,7 +242,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
-                <signal name="pressed" handler="rewind" swapped="no"/>
+                <signal name="button-press-event" handler="rewind" swapped="no"/>
                 <child>
                   <object class="GtkImage" id="icon_seek_back">
                     <property name="visible">True</property>
@@ -279,7 +279,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
-                <signal name="pressed" handler="forward" swapped="no"/>
+                <signal name="button-press-event" handler="forward" swapped="no"/>
                 <child>
                   <object class="GtkImage" id="icon_seek_forward">
                     <property name="visible">True</property>

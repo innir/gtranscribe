@@ -54,6 +54,7 @@ locale.setlocale(locale.LC_ALL, '')
 gettext.textdomain('gTranscribe')
 DBusGMainLoop(set_as_default=True)
 
+
 class gTranscribeWindow:
 
     def __init__(self):
@@ -72,8 +73,12 @@ class gTranscribeWindow:
         self.spinbutton_jump.set_range(0, 5000)
         self.spinbutton_jump.set_increments(10, 100)
 
+        self.rewind_button = builder.get_object('button_seek_back')
+        self.rewind_button.set_sensitive(False)
+        self.forward_button = builder.get_object('button_seek_forward')
+        self.forward_button.set_sensitive(False)
+
         self.speedscale = builder.get_object('scale_speed')
-        self.speedscale.set_value(1)
 
         self.play_action = builder.get_object("action_play")
         self.play_action.set_sensitive(False)
@@ -230,12 +235,14 @@ class gTranscribeWindow:
         self.window.set_title(u'gTranscribe \u2013 %s' % filename)
         self.play_action.set_sensitive(True)
         self.slider.set_sensitive(True)
+        self.rewind_button.set_sensitive(True)
+        self.forward_button.set_sensitive(True)
 
     def on_file_ended(self, signal):
         logging.debug('received signal "ended"')
         self.play_action.set_active(False)
         # Automatically save text if a filename is given to avoid data loss
-        if self.filename != None:
+        if self.filename is not None:
             self.on_save_menu_item_activate(self.window)
         self.player.reset()
 
@@ -312,14 +319,14 @@ class gTranscribeWindow:
     def inc_speed(self, action):
         self.speedscale.set_value(self.speedscale.get_value() + 0.1)
 
-    def forward(self, action):
+    def forward(self, action, user_data):
         new_position = self.position + time_to_ns(self.SEEK_INTERVAL)
         if new_position > self.player.duration:
             new_position = self.player.duration
         self.player.position = new_position
         GObject.idle_add(self.play_loop, True)
 
-    def rewind(self, action):
+    def rewind(self, action, user_data):
         new_position = self.position - time_to_ns(self.SEEK_INTERVAL)
         if new_position < 0:
             new_position = 0
