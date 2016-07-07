@@ -78,6 +78,11 @@ class gTranscribeWindow:
         self.forward_button = builder.get_object('button_seek_forward')
         self.forward_button.set_sensitive(False)
 
+        self.rewind_menu = builder.get_object('rewind')
+        self.rewind_menu.set_sensitive(False)
+        self.forward_menu = builder.get_object('forward')
+        self.forward_menu.set_sensitive(False)
+
         self.speedscale = builder.get_object('scale_speed')
 
         self.play_action = builder.get_object("action_play")
@@ -237,6 +242,8 @@ class gTranscribeWindow:
         self.slider.set_sensitive(True)
         self.rewind_button.set_sensitive(True)
         self.forward_button.set_sensitive(True)
+        self.rewind_menu.set_sensitive(True)
+        self.forward_menu.set_sensitive(True)
 
     def on_file_ended(self, signal):
         logging.debug('received signal "ended"')
@@ -319,14 +326,14 @@ class gTranscribeWindow:
     def inc_speed(self, action):
         self.speedscale.set_value(self.speedscale.get_value() + 0.1)
 
-    def forward(self, action, user_data):
+    def forward(self, action=None, user_data=None):
         new_position = self.position + time_to_ns(self.SEEK_INTERVAL)
         if new_position > self.player.duration:
             new_position = self.player.duration
         self.player.position = new_position
         GObject.idle_add(self.play_loop, True)
 
-    def rewind(self, action, user_data):
+    def rewind(self, action=None, user_data=None):
         new_position = self.position - time_to_ns(self.SEEK_INTERVAL)
         if new_position < 0:
             new_position = 0
