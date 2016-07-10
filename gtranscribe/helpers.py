@@ -8,11 +8,11 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import os
 import sys
@@ -27,10 +27,12 @@ gettext.textdomain('gTranscribe')
 
 # Where your project will look for your data (for instance, images and ui
 # files). By default, this is ../data, relative your trunk layout
-__gtranscribe_data_directory__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '../data/'))
+__gtranscribe_data_directory__ = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../data/'))
+
 # if this path does not exist fall back to system wide directory
 if not os.path.exists(__gtranscribe_data_directory__):
-    __gtranscribe_data_directory__ = sys.exec_prefix + '/share/gTranscribe/'
+    __gtranscribe_data_directory__ = sys.prefix + '/share/gTranscribe/'
 
 
 def get_data_file(*path_segments):
@@ -130,8 +132,10 @@ def get_save_filename(self):
 
 def error_message(self, message):
     dialog = Gtk.MessageDialog(None,
-                               Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                               Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message)
+                               Gtk.DialogFlags.MODAL |
+                               Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                               Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
+                               message)
     dialog.run()
     dialog.destroy()
 

@@ -8,11 +8,11 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import logging
 import gi
@@ -38,7 +38,6 @@ class gTranscribePlayer(Gst.Bin):
         self._rate = 1
         self._duration = None
         self.init_pipeline()
-
 
     def init_pipeline(self):
         self.pipeline = Gst.Pipeline()
@@ -166,7 +165,7 @@ class gTranscribePlayer(Gst.Bin):
             logger.debug("%s" % print(message.parse_error()))
             self.state = Gst.State.NULL
 
-    def open(self, filepath, duration = True):
+    def open(self, filepath, duration=True):
         logger.debug('Opening file "%s"' % filepath)
         self.state = Gst.State.READY
         self.audiosrc.set_property('location', filepath)

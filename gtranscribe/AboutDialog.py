@@ -8,11 +8,11 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import gettext
 from gettext import gettext as _
@@ -31,11 +31,28 @@ class AboutDialog:
         self.about_dialog.set_destroy_with_parent(True)
         self.about_dialog.set_name("gTranscribe")
         self.about_dialog.set_version("0.5.2")
-        self.about_dialog.set_copyright("Copyright \xc2\xa9 2013-2016 Philip Rinn\nCopyright \xc2\xa9 2010 Frederik Elwert")
-        self.about_dialog.set_comments(_("gTranscribe is a software focussed on easy transcription of spoken words."))
+        self.about_dialog.set_copyright("Copyright 2013-2016 Philip Rinn\n"
+                                        "Copyright 2010 Frederik Elwert")
+        self.about_dialog.set_comments(_("gTranscribe is a software focussed "
+                                         "on easy transcription of spoken "
+                                         "words."))
         self.about_dialog.set_website("https://github.com/innir/gtranscribe")
         self.about_dialog.set_authors(authors)
-        self.about_dialog.set_license("This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License version 3 as\npublished by the Free Software Foundation.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses/.")
+        self.about_dialog.set_license("This program is free software: you can "
+                                      "redistribute it and/or modify\nit under"
+                                      " the terms of the GNU General Public "
+                                      "License version 3 as\npublished by the "
+                                      "Free Software Foundation.\n\nThis "
+                                      "program is distributed in the hope that"
+                                      " it will be useful,\nbut WITHOUT ANY "
+                                      "WARRANTY; without even the implied "
+                                      "warranty of\nMERCHANTABILITY or FITNESS"
+                                      " FOR A PARTICULAR PURPOSE. See the\nGNU"
+                                      " General Public License for more "
+                                      "details.\n\nYou should have received a "
+                                      "copy of the GNU General Public License"
+                                      "\nalong with this program. If not, see "
+                                      "https://www.gnu.org/licenses/.")
 
         icon_theme = Gtk.IconTheme.get_default()
         if icon_theme.has_icon('gtranscribe'):

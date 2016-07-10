@@ -9,11 +9,11 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import sys
 import os
@@ -116,10 +116,11 @@ class gTranscribeWindow:
 
         try:
             session_bus = dbus.SessionBus()
-            settings_daemon_proxy = session_bus.get_object('org.gnome.SettingsDaemon',
-                                                           '/org/gnome/SettingsDaemon/MediaKeys')
-            self.settings_daemon = dbus.Interface(settings_daemon_proxy,
-                                                  'org.gnome.SettingsDaemon.MediaKeys')
+            settings_daemon_proxy = session_bus.get_object(
+                'org.gnome.SettingsDaemon',
+                '/org/gnome/SettingsDaemon/MediaKeys')
+            self.settings_daemon = dbus.Interface(
+                settings_daemon_proxy, 'org.gnome.SettingsDaemon.MediaKeys')
             self.settings_daemon.GrabMediaPlayerKeys('gTranscribe', 0)
         except dbus.DBusException:
             self.settings_daemon = None
@@ -136,7 +137,8 @@ class gTranscribeWindow:
         # set up meta data database
         con = sqlite3.connect(os.path.join(self.cache_dir, "metadata.db"))
         cur = con.cursor()
-        cur.execute('CREATE TABLE IF NOT EXISTS metadata(md5 TEXT PRIMARY KEY, position INTEGER, speed REAL)')
+        cur.execute('CREATE TABLE IF NOT EXISTS metadata(md5 TEXT PRIMARY KEY,\
+                    position INTEGER, speed REAL)')
         con.commit()
         cur.close()
         con.close()
@@ -169,9 +171,10 @@ class gTranscribeWindow:
 
     update_ui = property(_get_update_ui, _set_update_ui)
 
-    # Called when the user clicks the 'About' menu. We use gtk_show_about_dialog()
-    # which is a convenience function to show a GtkAboutDialog. This dialog will
-    # NOT be modal but will be on top of the main application window.
+    # Called when the user clicks the 'About' menu. We use
+    # gtk_show_about_dialog() which is a convenience function
+    # to show a GtkAboutDialog. This dialog will NOT be modal
+    # but will be on top of the main application window.
     def about(self, menuitem, data=None):
         if self.about_dialog:
             return
@@ -182,7 +185,8 @@ class gTranscribeWindow:
     def open(self, action):
         open_dlg = Gtk.FileChooserDialog(_('Open Audio File'), self.window,
                                          Gtk.FileChooserAction.OPEN,
-                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                         (Gtk.STOCK_CANCEL,
+                                          Gtk.ResponseType.CANCEL,
                                           Gtk.STOCK_OK, Gtk.ResponseType.OK))
         filter = Gtk.FileFilter()
         filter.set_name(_('All Audio Files'))
@@ -206,7 +210,8 @@ class gTranscribeWindow:
         # insert md5 into database so we can just update afterwards
         con = sqlite3.connect(os.path.join(self.cache_dir, "metadata.db"))
         cur = con.cursor()
-        cur.execute('INSERT OR IGNORE INTO metadata (md5) VALUES (?)', (self.md5,))
+        cur.execute('INSERT OR IGNORE INTO metadata (md5) VALUES (?)',
+                    (self.md5,))
         con.commit()
         cur.close()
         con.close()
@@ -220,7 +225,8 @@ class gTranscribeWindow:
         self.position = 0
         fileinfo = FileInfo(filepath, self.md5)
         if fileinfo.position:
-            logging.debug('Resuming at position %s' % ns_to_time(fileinfo.position))
+            logging.debug('Resuming at position %s' %
+                          ns_to_time(fileinfo.position))
             self.player.position = fileinfo.position
             self.position = fileinfo.position
         if fileinfo.speed:
@@ -400,12 +406,13 @@ class gTranscribeWindow:
         Gtk.main_quit()
 
     def on_jump_value_changed(self, range):
-        self.JUMP_BACK_INTERVAL = ns_to_time(range.get_value_as_int() * 1000000)
+        self.JUMP_BACK_INTERVAL = ns_to_time(range.get_value_as_int() *
+                                             1000000)
         self.SEEK_INTERVAL = self.JUMP_BACK_INTERVAL
 
-    # Called when the user clicks the 'Open' menu. We need to prompt for save if
-    # the file has been modified, allow the user to choose a file to open, and
-    # then load it into the buffer for the GtkTextView.
+    # Called when the user clicks the 'Open' menu. We need to prompt for save
+    # if the file has been modified, allow the user to choose a file to open,
+    # and then load it into the buffer for the GtkTextView.
     # The previous contents are overwritten.
     def on_open_menu_item_activate(self, menuitem, data=None):
         self.filename = get_open_filename(self)
@@ -423,7 +430,8 @@ class gTranscribeWindow:
                     pos = pos[-8:-1]
                     pos_tag = re.compile('\d\d:\d\d.\d')
                     if pos_tag.match(pos):
-                        self.player.position = time_to_ns(datetime.datetime.strptime(pos, "%M:%S.%f"))
+                        self.player.position = time_to_ns(
+                            datetime.datetime.strptime(pos, "%M:%S.%f"))
                         GObject.idle_add(self.play_loop, True)
                         logging.debug('Set position on load')
                 # disable the text view while loading the buffer with the text
@@ -446,7 +454,8 @@ class gTranscribeWindow:
             # disable text view while getting contents of buffer
             buff = self.text_view.get_buffer()
             self.text_view.set_sensitive(False)
-            text = buff.get_text(buff.get_start_iter(), buff.get_end_iter(), True)
+            text = buff.get_text(buff.get_start_iter(), buff.get_end_iter(),
+                                 True)
             self.text_view.set_sensitive(True)
             buff.set_modified(False)
             fout = open(self.filename, "w")
@@ -460,7 +469,8 @@ class gTranscribeWindow:
     def on_text_insert(self, widget, event):
         keyname = Gdk.keyval_name(event.keyval)
         if keyname == 'Return':
-            pos_str = ' [' + trim(ns_to_time(self.position).strftime(self.time_str)) + ']'
+            pos_str = ' [' + trim(
+                ns_to_time(self.position).strftime(self.time_str)) + ']'
             text_buffer = self.text_view.get_buffer()
             text_buffer.insert_at_cursor(pos_str)
         # handling for yellow footswitch "science" from cleware
@@ -471,33 +481,34 @@ class gTranscribeWindow:
 
     # Run main application window
     def main(self):
-        self.spinbutton_jump.set_value(time_to_ns(self.JUMP_BACK_INTERVAL) / 1000000)
+        self.spinbutton_jump.set_value(time_to_ns(self.JUMP_BACK_INTERVAL) /
+                                       1000000)
         self.window.connect('key_press_event', self.on_text_insert)
         self.window.show()
         Gtk.main()
 
 
 if __name__ == "__main__":
-    # Support for command line options.
+    # Support for command line options
     parser = optparse.OptionParser(version="%prog %ver")
     parser.add_option(
         "-v", "--verbose", action="store_true", dest="verbose",
         help=_("Show debug messages"))
     (options, args) = parser.parse_args()
 
-    # Set the logging level to show debug messages.
+    # Set the logging level to show debug messages
     if options.verbose:
         logging.basicConfig(level=logging.DEBUG)
         logging.debug('logging enabled')
 
-    # Run the application.
     filepath = None
     if args and os.path.isfile(args[0]):
         filepath = args[0]
 
     # Catch Ctrl+C and quit the program
-    signal.signal(signal.SIGINT, lambda a,b: gtranscriber.quit(gtranscriber))
-    GLib.timeout_add(500, lambda : True)
+    signal.signal(signal.SIGINT, lambda a, b: gtranscriber.quit(gtranscriber))
+    GLib.timeout_add(500, lambda: True)
 
+    # Run the application
     gtranscriber = gTranscribeWindow()
     gtranscriber.main()
