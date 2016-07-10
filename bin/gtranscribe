@@ -30,6 +30,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSpell', '3.0')
 from gi.repository import GLib, GObject, Gtk, Gdk, GtkSpell
 from dbus.mainloop.glib import DBusGMainLoop
+import signal
 
 # Add project root directory (enable symlink, and trunk execution).
 PROJECT_ROOT_DIRECTORY = os.path.abspath(
@@ -493,6 +494,10 @@ if __name__ == "__main__":
     filepath = None
     if args and os.path.isfile(args[0]):
         filepath = args[0]
+
+    # Catch Ctrl+C and quit the program
+    signal.signal(signal.SIGINT, lambda a,b: gtranscriber.quit(gtranscriber))
+    GLib.timeout_add(500, lambda : True)
 
     gtranscriber = gTranscribeWindow()
     gtranscriber.main()
