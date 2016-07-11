@@ -28,5 +28,6 @@ DistUtilsExtra.auto.setup(
     description='gTranscribe',
     long_description='gTranscribe is a software focussed on easy transcription'
                      ' of spoken words.',
-    url='https://github.com/innir/gtranscribe'
+    url='https://github.com/innir/gtranscribe',
+    data_files=[('share/appdata',['gtranscribe.appdata.xml'])]
 )
