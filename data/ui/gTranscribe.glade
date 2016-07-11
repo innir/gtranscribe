@@ -501,6 +501,7 @@ audio-volume-medium</property>
               <object class="GtkTextView" id="text_view">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_focus">True</property>
                 <property name="pixels_below_lines">4</property>
                 <property name="wrap_mode">word</property>
                 <property name="left_margin">2</property>
