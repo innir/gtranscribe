@@ -25,19 +25,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 gettext.textdomain('gTranscribe')
 
-# Where your project will look for your data (for instance, images and ui
-# files). By default, this is ../data, relative your trunk layout
-__gtranscribe_data_directory__ = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '../data/'))
-
-# if this path does not exist fall back to system wide directory
-if not os.path.exists(__gtranscribe_data_directory__):
-    __gtranscribe_data_directory__ = sys.prefix + '/share/gTranscribe/'
-
-
-def get_data_file(*path_segments):
-    return os.path.join(__gtranscribe_data_directory__, *path_segments)
-
 
 def trim(timestring, digits=1):
     """
