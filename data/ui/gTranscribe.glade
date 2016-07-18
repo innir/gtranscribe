@@ -411,6 +411,7 @@
                 <property name="can_focus">True</property>
                 <property name="max_length">4</property>
                 <property name="invisible_char">●</property>
+                <property name="width_chars">5</property>
                 <property name="primary_icon_tooltip_text" translatable="yes">Change the time to jump back on resume in ms</property>
                 <property name="numeric">True</property>
                 <signal name="value-changed" handler="on_jump_value_changed" swapped="no"/>
