@@ -302,7 +302,7 @@ class gTranscribeWindow:
                 fileinfo = FileInfo(self.player.filename, self.md5)
                 fileinfo.position = self.position
 
-    def play_loop(self, once=False):
+    def play_loop(self, once=False, update_scale=True):
         try:
             self.position = self.player.position
         except:
@@ -313,17 +313,18 @@ class gTranscribeWindow:
         except:
             logging.warn("query failed, can't get file duration")
             return False
-        self.set_position_label(duration)
+        self.set_position_label(duration, update_scale)
         if once:
             return False
         else:
             return True
 
-    def set_position_label(self, duration):
+    def set_position_label(self, duration, update_scale=True):
         if duration > 0:
             frac = float(self.position) / float(duration)
-            scalepos = frac * self.slider.get_adjustment().get_upper()
-            self.slider.set_value(scalepos)
+            if update_scale:
+                scalepos = frac * self.slider.get_adjustment().get_upper()
+                self.slider.set_value(scalepos)
             pos_str = trim(ns_to_time(self.position).strftime(self.time_str))
             self.pos_label.set_text(pos_str)
 
@@ -370,14 +371,14 @@ class gTranscribeWindow:
         max_value = self.slider.get_adjustment().get_upper()
         new_position = self.player.duration * (value / max_value)
         self.player.position = new_position
+        # Update only position label
+        GObject.idle_add(self.play_loop, True, False)
 
     def on_scale_position_button_press_event(self, widget, event):
         logging.debug('Begin seeking')
         self.oldstate = self.player.state
         self.player.pause()
         self.seeking = True
-        self.window.update_ui = True
-        self._set_update_ui(True)
 
     def on_scale_position_button_release_event(self, widget, event):
         logging.debug('End seeking')
@@ -386,6 +387,9 @@ class gTranscribeWindow:
         if not self.player.playing:
             self.window.update_ui = False
             self._set_update_ui(False)
+        else:
+            self.window.update_ui = True
+            self._set_update_ui(True)
 
     def on_volumebutton_value_changed(self, scalebutton, value):
         self.player.volume = value
