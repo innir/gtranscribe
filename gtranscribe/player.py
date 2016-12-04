@@ -92,7 +92,11 @@ class gTranscribePlayer(Gst.Bin):
 
     def _get_position(self):
         """Return the position of the current stream."""
-        return self.pipeline.query_position(Gst.Format.TIME)[1]
+        # Sometimes querying the position does not work on the first try
+        pos = [0]
+        while pos[0] == 0:
+            pos = self.pipeline.query_position(Gst.Format.TIME)
+        return pos[1]
 
     def _set_position(self, position):
         self.pipeline.seek(self._rate,
