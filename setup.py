@@ -21,7 +21,7 @@ assert DistUtilsExtra.auto.__version__ >= '2.22', 'gTranscribe needs '\
 
 DistUtilsExtra.auto.setup(
     name='gTranscribe',
-    version='0.5.2',
+    version='0.6',
     license='GPL-3',
     author='Philip Rinn',
     author_email='rinni@inventati.org',
@@ -29,5 +29,5 @@ DistUtilsExtra.auto.setup(
     long_description='gTranscribe is a software focussed on easy transcription'
                      ' of spoken words.',
     url='https://github.com/innir/gtranscribe',
-    data_files=[('share/appdata',['gtranscribe.appdata.xml'])]
+    data_files=[('share/appdata', ['gtranscribe.appdata.xml'])]
 )

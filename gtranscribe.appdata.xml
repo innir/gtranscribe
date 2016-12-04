@@ -34,10 +34,10 @@
     <release version="0.2" date="2013-07-14" />
     <release version="0.3" date="2016-02-24" />
     <release version="0.4" date="2016-02-27" />
-    <release version="0.4" date="2016-02-27" />
     <release version="0.5" date="2016-02-28" />
     <release version="0.5.1" date="2016-07-03" />
     <release version="0.5.2" date="2016-07-06" />
+    <release version="0.6" date="2016-12-04" />
   </releases>
   <url type="homepage">https://github.com/innir/gtranscribe</url>
   <url type="bugtracker">https://github.com/innir/gtranscribe/issues</url>
