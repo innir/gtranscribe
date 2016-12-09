@@ -69,6 +69,7 @@ class gTranscribeWindow:
         spellchecker = GtkSpell.Checker()
         spellchecker.set_language(locale.getdefaultlocale()[0])
         spellchecker.attach(self.text_view)
+        self.text_buffer = self.text_view.get_buffer()
 
         self.spinbutton_jump = builder.get_object("spinbutton_jump")
         self.spinbutton_jump.set_range(0, 5000)
@@ -417,7 +418,7 @@ class gTranscribeWindow:
     # Called when the user clicks the 'Open' menu. We need to prompt for save
     # if the file has been modified, allow the user to choose a file to open,
     # and then load it into the buffer for the GtkTextView.
-    # The previous contents are overwritten.
+    # The previous contents is overwritten.
     def on_open_menu_item_activate(self, menuitem, data=None):
         self.filename = get_open_filename(self)
         if self.filename:
@@ -440,9 +441,8 @@ class gTranscribeWindow:
                         logging.debug('Set position on load')
                 # disable the text view while loading the buffer with the text
                 self.text_view.set_sensitive(False)
-                buff = self.text_view.get_buffer()
-                buff.set_text(text)
-                buff.set_modified(False)
+                self.text_buffer.set_text(text)
+                self.text_buffer.set_modified(False)
                 self.text_view.set_sensitive(True)
             except:
                 # error loading file, show message to user
@@ -456,12 +456,12 @@ class gTranscribeWindow:
             self.filename = get_save_filename(self)
         try:
             # disable text view while getting contents of buffer
-            buff = self.text_view.get_buffer()
             self.text_view.set_sensitive(False)
-            text = buff.get_text(buff.get_start_iter(), buff.get_end_iter(),
-                                 True)
+            text = self.text_buffer.get_text(self.text_buffer.get_start_iter(),
+                                             self.text_buffer.get_end_iter(),
+                                             True)
             self.text_view.set_sensitive(True)
-            buff.set_modified(False)
+            self.text_buffer.set_modified(False)
             fout = open(self.filename, "w")
             fout.write(text)
             fout.close()
@@ -475,8 +475,7 @@ class gTranscribeWindow:
         if keyname == 'Return':
             pos_str = ' [' + trim(
                 ns_to_time(self.position).strftime(self.time_str)) + ']'
-            text_buffer = self.text_view.get_buffer()
-            text_buffer.insert_at_cursor(pos_str)
+            self.text_buffer.insert_at_cursor(pos_str)
         # handling for yellow footswitch "science" from cleware
         if keyname == 'F9':
             self.play_action.activate()
