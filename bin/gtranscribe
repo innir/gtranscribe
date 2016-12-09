@@ -109,6 +109,8 @@ class gTranscribeWindow:
 
         self.position = 0
 
+        self.md5 = None
+
         # TODO: Make these configurable
         self.JUMP_BACK_INTERVAL = datetime.time(second=1)
         self.JUMP_BACK = True
@@ -427,18 +429,20 @@ class gTranscribeWindow:
                 fin = open(self.filename, "r")
                 text = fin.read()
                 fin.close()
-                # get possibly the last position
-                pos = text[-10:-1]
-                logging.debug('Try to get the last position from %s' % pos)
-                pos_tag = re.compile('\[\d\d:\d\d.\d\]')
-                if pos_tag.match(pos):
-                    pos = pos[-8:-1]
-                    pos_tag = re.compile('\d\d:\d\d.\d')
+                # Only do this is an audio file is already loaded
+                if self.md5 is not None:
+                    # Try to get the last position
+                    pos = text[-10:-1]
+                    logging.debug('Try to get the last position from %s' % pos)
+                    pos_tag = re.compile('\[\d\d:\d\d.\d\]')
                     if pos_tag.match(pos):
-                        self.player.position = time_to_ns(
-                            datetime.datetime.strptime(pos, "%M:%S.%f"))
-                        GObject.idle_add(self.play_loop, True)
-                        logging.debug('Set position on load')
+                        pos = pos[-8:-1]
+                        pos_tag = re.compile('\d\d:\d\d.\d')
+                        if pos_tag.match(pos):
+                            self.player.position = time_to_ns(
+                                datetime.datetime.strptime(pos, "%M:%S.%f"))
+                            GObject.idle_add(self.play_loop, True)
+                            logging.debug('Set position on load')
                 # disable the text view while loading the buffer with the text
                 self.text_view.set_sensitive(False)
                 self.text_buffer.set_text(text)
