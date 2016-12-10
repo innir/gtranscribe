@@ -84,6 +84,8 @@ class gTranscribeWindow:
         self.rewind_menu.set_sensitive(False)
         self.forward_menu = builder.get_object('forward')
         self.forward_menu.set_sensitive(False)
+        self.jump_menu = builder.get_object('jump')
+        self.jump_menu.set_sensitive(False)
 
         self.speedscale = builder.get_object('scale_speed')
 
@@ -254,6 +256,7 @@ class gTranscribeWindow:
         self.forward_button.set_sensitive(True)
         self.rewind_menu.set_sensitive(True)
         self.forward_menu.set_sensitive(True)
+        self.jump_menu.set_sensitive(True)
 
     def on_file_ended(self, signal):
         logging.debug('received signal "ended"')
@@ -351,6 +354,31 @@ class gTranscribeWindow:
         self.player.position = new_position
         GObject.idle_add(self.play_loop, True)
 
+    def jump(self, action):
+        # Only do this if an audio file is already loaded
+        if self.md5 is not None:
+            # Get the current cursor position
+            position = self.text_buffer.get_iter_at_mark(
+                self.text_buffer.get_insert())
+            # Get the cursor position relative  to the beginning of this line
+            line_offset = position.get_line_offset()
+            # Get beginning of the line
+            line_start = position.get_offset() - line_offset
+            # Get the text at the end of the last line
+            pos = self.text_buffer.get_text(
+                self.text_buffer.get_iter_at_offset(line_start - 10),
+                self.text_buffer.get_iter_at_offset(line_start - 1), True)
+            logging.debug('Try to get the position from %s' % pos)
+            pos_tag = re.compile('\[\d\d:\d\d.\d\]')
+            if pos_tag.match(pos):
+                pos = pos[-8:-1]
+                pos_tag = re.compile('\d\d:\d\d.\d')
+                if pos_tag.match(pos):
+                    self.player.position = time_to_ns(
+                        datetime.datetime.strptime(pos, "%M:%S.%f"))
+                    GObject.idle_add(self.play_loop, True)
+                    logging.debug('Set position')
+
     def copy_position(self, action):
         pos_str = trim(ns_to_time(self.position).strftime(self.time_str))
         clipboard = Gtk.clipboard_get()
@@ -368,7 +396,7 @@ class gTranscribeWindow:
 
     def on_scale_position_value_changed(self, range):
         if not self.seeking:
-            # Slider changed programmatically, do nothing
+            # Slider changed without user action, do nothing
             return
         value = range.get_value()
         max_value = self.slider.get_adjustment().get_upper()
@@ -429,7 +457,7 @@ class gTranscribeWindow:
                 fin = open(self.filename, "r")
                 text = fin.read()
                 fin.close()
-                # Only do this is an audio file is already loaded
+                # Only do this if an audio file is already loaded
                 if self.md5 is not None:
                     # Try to get the last position
                     pos = text[-10:-1]
