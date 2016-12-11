@@ -111,8 +111,6 @@ class gTranscribeWindow:
 
         self.position = 0
 
-        self.md5 = None
-
         # TODO: Make these configurable
         self.JUMP_BACK_INTERVAL = datetime.time(second=1)
         self.JUMP_BACK = True
@@ -356,7 +354,7 @@ class gTranscribeWindow:
 
     def jump(self, action):
         # Only do this if an audio file is already loaded
-        if self.md5 is not None:
+        if hasattr(self, 'md5'):
             # Get the current cursor position
             position = self.text_buffer.get_iter_at_mark(
                 self.text_buffer.get_insert())
@@ -458,7 +456,7 @@ class gTranscribeWindow:
                 text = fin.read()
                 fin.close()
                 # Only do this if an audio file is already loaded
-                if self.md5 is not None:
+                if hasattr(self, 'md5'):
                     # Try to get the last position
                     pos = text[-10:-1]
                     logging.debug('Try to get the last position from %s' % pos)
