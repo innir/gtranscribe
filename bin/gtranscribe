@@ -478,6 +478,9 @@ class gTranscribeWindow:
                 self.text_buffer.set_text(text)
                 self.text_buffer.set_modified(False)
                 self.text_view.set_sensitive(True)
+                self.text_view.grab_focus()
+                GObject.idle_add(self.text_view.scroll_mark_onscreen,
+                                 self.text_buffer.get_insert())
             except:
                 # error loading file, show message to user
                 self.filename = None
