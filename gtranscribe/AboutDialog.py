@@ -21,6 +21,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 gettext.textdomain('gTranscribe')
 
+
 class AboutDialog:
 
     def __init__(self, trans, icon):
@@ -37,21 +38,7 @@ class AboutDialog:
                                          "words."))
         self.about_dialog.set_website("https://github.com/innir/gtranscribe")
         self.about_dialog.set_authors(authors)
-        self.about_dialog.set_license("This program is free software: you can "
-                                      "redistribute it and/or modify\nit under"
-                                      " the terms of the GNU General Public "
-                                      "License version 3 as\npublished by the "
-                                      "Free Software Foundation.\n\nThis "
-                                      "program is distributed in the hope that"
-                                      " it will be useful,\nbut WITHOUT ANY "
-                                      "WARRANTY; without even the implied "
-                                      "warranty of\nMERCHANTABILITY or FITNESS"
-                                      " FOR A PARTICULAR PURPOSE. See the\nGNU"
-                                      " General Public License for more "
-                                      "details.\n\nYou should have received a "
-                                      "copy of the GNU General Public License"
-                                      "\nalong with this program. If not, see "
-                                      "https://www.gnu.org/licenses/.")
+        self.about_dialog.set_license_type(Gtk.License.GPL_3_0)
         self.about_dialog.set_logo(icon)
         self.about_dialog.connect("response", self._close, trans)
         self.about_dialog.connect("delete-event", self._delete_event, trans)
