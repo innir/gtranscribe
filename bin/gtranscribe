@@ -31,10 +31,11 @@ gi.require_version('GtkSpell', '3.0')
 from gi.repository import GLib, GObject, Gtk, Gdk, GtkSpell, GdkPixbuf
 from dbus.mainloop.glib import DBusGMainLoop
 import signal
+import inspect
 
-# Add project root directory (enable symlink, and trunk execution).
-PROJECT_ROOT_DIRECTORY = os.path.abspath(
-    os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0]))))
+# Add project root directory to sys.path.
+PROJECT_ROOT_DIRECTORY = os.path.dirname(os.path.dirname(
+    os.path.realpath(inspect.getfile(inspect.currentframe()))))
 
 if PROJECT_ROOT_DIRECTORY not in sys.path:
     sys.path.insert(0, PROJECT_ROOT_DIRECTORY)
