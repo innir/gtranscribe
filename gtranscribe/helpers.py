@@ -84,15 +84,15 @@ def uri_to_filepath(uri):
     return file.get_path()
 
 
-def get_open_filename(self):
+def get_open_filename(self, title, filter_name, filter_mime):
     filename = None
-    chooser = Gtk.FileChooserDialog(_("Open File..."), self.window,
+    chooser = Gtk.FileChooserDialog(title, self.window,
                                     Gtk.FileChooserAction.OPEN,
                                     (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                      Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
     file_filter = Gtk.FileFilter()
-    file_filter.set_name(_('Plain Text Files'))
-    file_filter.add_mime_type('text/plain')
+    file_filter.set_name(filter_name)
+    file_filter.add_mime_type(filter_mime)
     chooser.add_filter(file_filter)
     chooser.set_filter(file_filter)
 

@@ -202,20 +202,9 @@ class gTranscribeWindow:
         self.about_dialog = True
 
     def open(self, action):
-        open_dlg = Gtk.FileChooserDialog(_('Open Audio File'), self.window,
-                                         Gtk.FileChooserAction.OPEN,
-                                         (Gtk.STOCK_CANCEL,
-                                          Gtk.ResponseType.CANCEL,
-                                          Gtk.STOCK_OK, Gtk.ResponseType.OK))
-        filter = Gtk.FileFilter()
-        filter.set_name(_('All Audio Files'))
-        filter.add_mime_type('audio/*')
-        open_dlg.add_filter(filter)
-        open_dlg.set_filter(filter)
-        result = open_dlg.run()
-        if result == Gtk.ResponseType.OK:
-            self.open_file(open_dlg.get_filename())
-        open_dlg.destroy()
+        audiofile = get_open_filename(self, _('Open Audio File'),
+            _('All Audio Files'), 'audio/*')
+        self.open_file(audiofile)
 
     def open_recent(self, item):
         uri = item.get_current_uri()
@@ -464,7 +453,8 @@ class gTranscribeWindow:
     # and then load it into the buffer for the GtkTextView.
     # The previous contents is overwritten.
     def on_open_menu_item_activate(self, menuitem, data=None):
-        self.filename = get_open_filename(self)
+        self.filename = get_open_filename(self, _("Open Text File"),
+            _('Plain Text Files'), 'text/plain')
         if self.filename:
             try:
                 # get the file contents
