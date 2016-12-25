@@ -17,7 +17,6 @@
 import sqlite3
 import os.path
 import logging
-import gi
 from gi.repository import GLib
 logger = logging.getLogger('fileinfo')
 
