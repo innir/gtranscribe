@@ -20,7 +20,7 @@ import os
 import sqlite3
 import re
 import logging
-import optparse
+import argparse
 import locale
 import gettext
 from gettext import gettext as _
@@ -244,12 +244,12 @@ class gTranscribeWindow:
         self.position = 0
         fileinfo = FileInfo(filepath, self.md5)
         if fileinfo.position:
-            logging.debug('Resuming at position %s' %
+            logging.debug('Resuming at position %s',
                           ns_to_time(fileinfo.position))
             self.player.position = fileinfo.position
             self.position = fileinfo.position
         if fileinfo.speed:
-            logging.debug('Resuming with speed %s' % fileinfo.speed)
+            logging.debug('Resuming with speed %s', fileinfo.speed)
             self.speedscale.set_value(fileinfo.speed)
         duration = ns_to_time(self.player.duration)
         if duration.hour:
@@ -281,7 +281,7 @@ class gTranscribeWindow:
         self.player.reset()
 
     def on_media_key(self, application, key):
-        logging.debug('Received media key %s for %s' % (key, application))
+        logging.debug('Received media key %s for %s', key, application)
         if application == 'gTranscribe':
             if key == 'Play':
                 self.play_action.activate()
@@ -382,7 +382,7 @@ class gTranscribeWindow:
             pos = self.text_buffer.get_text(
                 self.text_buffer.get_iter_at_offset(line_start - 10),
                 self.text_buffer.get_iter_at_offset(line_start - 1), True)
-            logging.debug('Try to get the position from %s' % pos)
+            logging.debug('Try to get the position from %s', pos)
             pos_tag = re.compile('\[\d\d:\d\d.\d\]')
             if pos_tag.match(pos):
                 pos = pos[-8:-1]
@@ -475,7 +475,7 @@ class gTranscribeWindow:
                 if hasattr(self, 'md5'):
                     # Try to get the last position
                     pos = text[-10:-1]
-                    logging.debug('Try to get the last position from %s' % pos)
+                    logging.debug('Try to get the last position from %s', pos)
                     pos_tag = re.compile('\[\d\d:\d\d.\d\]')
                     if pos_tag.match(pos):
                         pos = pos[-8:-1]
@@ -495,8 +495,8 @@ class gTranscribeWindow:
                                  self.text_buffer.get_insert())
             except:
                 # error loading file, show message to user
+                error_message(self, "Could not open file: %s" % self.filename)
                 self.filename = None
-                error_message(self, "Could not open file: %s" % filename)
 
     # Called when the user clicks the 'Save' menu. We need to allow the user to
     # choose a file to save if it's an untitled document
@@ -542,20 +542,20 @@ class gTranscribeWindow:
 
 if __name__ == "__main__":
     # Support for command line options
-    parser = optparse.OptionParser(version="%prog %ver")
-    parser.add_option(
-        "-v", "--verbose", action="store_true", dest="verbose",
-        help=_("Show debug messages"))
-    (options, args) = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help=_("Show debug messages"))
+    parser.add_argument("file", nargs='?', help=_("Audio file to load"))
+    args = parser.parse_args()
 
     # Set the logging level to show debug messages
-    if options.verbose:
+    if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
         logging.debug('logging enabled')
 
     filepath = None
-    if args and os.path.isfile(args[0]):
-        filepath = args[0]
+    if args.file and os.path.isfile(args.file):
+        filepath = args.file
 
     # Catch Ctrl+C and quit the program
     signal.signal(signal.SIGINT, lambda a, b: gtranscriber.quit(gtranscriber))

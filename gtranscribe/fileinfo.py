@@ -52,14 +52,14 @@ class FileInfo(object):
         cur.close()
         con.close()
         self._cache[attribute] = value
-        logger.debug('Get attribute "%s": %s' % (attribute, value))
+        logger.debug('Get attribute "%s": %s', attribute, value)
         return value
 
     def _set_data(self, attribute, value):
         """
         A generic method to hide the verbose process of setting attributes.
         """
-        logger.debug('Set attribute "%s": %s' % (attribute, value))
+        logger.debug('Set attribute "%s": %s', attribute, value)
         query = 'UPDATE metadata SET ' + attribute + '=? WHERE md5=?'
         con = sqlite3.connect(database)
         cur = con.cursor()

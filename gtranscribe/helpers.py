@@ -90,11 +90,11 @@ def get_open_filename(self):
                                     Gtk.FileChooserAction.OPEN,
                                     (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                      Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-    filter = Gtk.FileFilter()
-    filter.set_name(_('Plain Text Files'))
-    filter.add_mime_type('text/plain')
-    chooser.add_filter(filter)
-    chooser.set_filter(filter)
+    file_filter = Gtk.FileFilter()
+    file_filter.set_name(_('Plain Text Files'))
+    file_filter.add_mime_type('text/plain')
+    chooser.add_filter(file_filter)
+    chooser.set_filter(file_filter)
 
     response = chooser.run()
     if response == Gtk.ResponseType.OK:
@@ -117,7 +117,7 @@ def get_save_filename(self):
 
 
 def error_message(self, message):
-    dialog = Gtk.MessageDialog(None,
+    dialog = Gtk.MessageDialog(self.window,
                                Gtk.DialogFlags.MODAL |
                                Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,

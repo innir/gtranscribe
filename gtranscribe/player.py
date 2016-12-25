@@ -87,7 +87,7 @@ class gTranscribePlayer(Gst.Bin):
         """Return the duration of the current stream."""
         if self._duration is None:
             self._duration = self.pipeline.query_duration(Gst.Format.TIME)[1]
-            logger.debug('Duration is: "%s"' % self._duration)
+            logger.debug('Duration is: "%s"', self._duration)
         return self._duration
 
     def _get_position(self):
@@ -166,11 +166,11 @@ class gTranscribePlayer(Gst.Bin):
             self.state = Gst.State.NULL
             self.emit('ended')
         elif message.type == Gst.MessageType.ERROR:
-            logger.debug("%s" % print(message.parse_error()))
+            logger.debug("%s", print(message.parse_error()))
             self.state = Gst.State.NULL
 
     def open(self, filepath, duration=True):
-        logger.debug('Opening file "%s"' % filepath)
+        logger.debug('Opening file "%s"', filepath)
         self.state = Gst.State.READY
         self.audiosrc.set_property('location', filepath)
         if duration:
