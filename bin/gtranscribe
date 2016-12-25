@@ -27,8 +27,16 @@ from gettext import gettext as _
 import dbus
 import gi
 gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSpell', '3.0')
-from gi.repository import GLib, GObject, Gtk, Gdk, GtkSpell, GdkPixbuf
+from gi.repository import GLib, GObject, Gtk, Gdk, GdkPixbuf
+try:
+    gi.require_version('Gspell', '1')
+    from gi.repository import Gspell
+    SPELL_FALLBACK = False
+except ValueError:
+    gi.require_version('GtkSpell', '3.0')
+    from gi.repository import GtkSpell
+    SPELL_FALLBACK = True
+
 from dbus.mainloop.glib import DBusGMainLoop
 import signal
 import inspect
@@ -70,9 +78,13 @@ class gTranscribeWindow:
         self.window.set_default_icon(self.icon)
 
         self.text_view = builder.get_object("text_view")
-        spellchecker = GtkSpell.Checker()
-        spellchecker.set_language(locale.getdefaultlocale()[0])
-        spellchecker.attach(self.text_view)
+        if SPELL_FALLBACK:
+            schecker = GtkSpell.Checker()
+            schecker.set_language(locale.getdefaultlocale()[0])
+            schecker.attach(self.text_view)
+        else:
+            schecker = Gspell.TextView.get_from_gtk_text_view(self.text_view)
+            Gspell.TextView.basic_setup(schecker)
         self.text_buffer = self.text_view.get_buffer()
 
         self.spinbutton_jump = builder.get_object("spinbutton_jump")
