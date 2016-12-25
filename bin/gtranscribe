@@ -28,7 +28,7 @@ import dbus
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSpell', '3.0')
-from gi.repository import GLib, GObject, Gtk, Gdk, GtkSpell
+from gi.repository import GLib, GObject, Gtk, Gdk, GtkSpell, GdkPixbuf
 from dbus.mainloop.glib import DBusGMainLoop
 import signal
 
@@ -64,6 +64,15 @@ class gTranscribeWindow:
         builder.add_from_file(get_data_file('ui', 'gTranscribe.glade'))
         builder.connect_signals(self)
         self.window = builder.get_object("gtranscribe_window")
+
+        icon_theme = Gtk.IconTheme.get_default()
+        if icon_theme.has_icon('gtranscribe'):
+            self.icon = icon_theme.load_icon('gtranscribe', 128, 0)
+        else:
+            self.icon = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+                get_data_file('icons', 'scalable', 'apps', 'gtranscribe.svg'),
+                128, 128, 0)
+        self.window.set_icon_list([self.icon])
 
         self.text_view = builder.get_object("text_view")
         spellchecker = GtkSpell.Checker()
@@ -181,7 +190,7 @@ class gTranscribeWindow:
     def about(self, menuitem, data=None):
         if self.about_dialog:
             return
-        about_dialog = AboutDialog.AboutDialog(self)
+        about_dialog = AboutDialog.AboutDialog(self, self.icon)
         about_dialog.show()
         self.about_dialog = True
 
@@ -519,20 +528,6 @@ class gTranscribeWindow:
         self.window.connect('key_press_event', self.on_text_insert)
         self.window.show()
         Gtk.main()
-
-
-def get_data_file(*path_segments):
-    # Where to look for data (ui and image files). By default,
-    # this is ../data, relative your trunk layout
-    data_directory = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '../data/'))
-
-    # If this path does not exist fall back to system wide directory
-    if not os.path.exists(data_directory):
-        data_directory = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), '../share/gTranscribe/'))
-
-    return os.path.join(data_directory, *path_segments)
 
 
 if __name__ == "__main__":

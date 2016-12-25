@@ -21,10 +21,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 gettext.textdomain('gTranscribe')
 
-
 class AboutDialog:
 
-    def __init__(self, trans):
+    def __init__(self, trans, icon):
         authors = ["Philip Rinn <rinni@inventati.org>"]
         self.about_dialog = Gtk.AboutDialog()
         self.about_dialog.set_transient_for(trans.window)
@@ -53,12 +52,7 @@ class AboutDialog:
                                       "copy of the GNU General Public License"
                                       "\nalong with this program. If not, see "
                                       "https://www.gnu.org/licenses/.")
-
-        icon_theme = Gtk.IconTheme.get_default()
-        if icon_theme.has_icon('gtranscribe'):
-            icon = icon_theme.load_icon('gtranscribe', 128, 0)
-            self.about_dialog.set_logo(icon)
-
+        self.about_dialog.set_logo(icon)
         self.about_dialog.connect("response", self._close, trans)
         self.about_dialog.connect("delete-event", self._delete_event, trans)
 
