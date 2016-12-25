@@ -72,7 +72,7 @@ class gTranscribeWindow:
             self.icon = GdkPixbuf.Pixbuf.new_from_file_at_scale(
                 get_data_file('icons', 'scalable', 'apps', 'gtranscribe.svg'),
                 128, 128, 0)
-        self.window.set_icon_list([self.icon])
+        self.window.set_default_icon(self.icon)
 
         self.text_view = builder.get_object("text_view")
         spellchecker = GtkSpell.Checker()
@@ -190,7 +190,7 @@ class gTranscribeWindow:
     def about(self, menuitem, data=None):
         if self.about_dialog:
             return
-        about_dialog = AboutDialog.AboutDialog(self, self.icon)
+        about_dialog = AboutDialog.AboutDialog(self)
         about_dialog.show()
         self.about_dialog = True
 

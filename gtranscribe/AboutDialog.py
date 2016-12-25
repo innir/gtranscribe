@@ -24,7 +24,7 @@ gettext.textdomain('gTranscribe')
 
 class AboutDialog:
 
-    def __init__(self, trans, icon):
+    def __init__(self, trans):
         authors = ["Philip Rinn <rinni@inventati.org>"]
         self.about_dialog = Gtk.AboutDialog()
         self.about_dialog.set_transient_for(trans.window)
@@ -39,7 +39,6 @@ class AboutDialog:
         self.about_dialog.set_website("https://github.com/innir/gtranscribe")
         self.about_dialog.set_authors(authors)
         self.about_dialog.set_license_type(Gtk.License.GPL_3_0)
-        self.about_dialog.set_logo(icon)
         self.about_dialog.connect("response", self._close, trans)
         self.about_dialog.connect("delete-event", self._delete_event, trans)
 
