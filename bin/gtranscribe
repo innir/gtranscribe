@@ -226,19 +226,19 @@ class gTranscribeWindow:
         self.player.open(filepath)
 
     def on_file_ready(self, signal, filepath):
-        logging.debug('received signal "ready"')
+        logger.debug('received signal "ready"')
         GObject.idle_add(self.update_file, filepath)
 
     def update_file(self, filepath):
         self.position = 0
         fileinfo = FileInfo(filepath, self.md5)
         if fileinfo.position:
-            logging.debug('Resuming at position %s',
+            logger.debug('Resuming at position %s',
                           ns_to_time(fileinfo.position))
             self.player.position = fileinfo.position
             self.position = fileinfo.position
         if fileinfo.speed:
-            logging.debug('Resuming with speed %s', fileinfo.speed)
+            logger.debug('Resuming with speed %s', fileinfo.speed)
             self.speedscale.set_value(fileinfo.speed)
         duration = ns_to_time(self.player.duration)
         if duration.hour:
@@ -262,15 +262,15 @@ class gTranscribeWindow:
         self.jump_menu.set_sensitive(True)
 
     def on_file_ended(self, signal):
-        logging.debug('received signal "ended"')
-        self.play_action.set_active(False)
+        logger.debug('received signal "ended"')
         # Automatically save text if a filename is given to avoid data loss
         if self.filename is not None:
             self.on_save_menu_item_activate(self.window)
         self.player.reset()
+        self.play_action.set_active(False)
 
     def on_media_key(self, application, key):
-        logging.debug('Received media key %s for %s', key, application)
+        logger.debug('Received media key %s for %s', key, application)
         if application == 'gTranscribe':
             if key == 'Play':
                 self.play_action.activate()
@@ -286,7 +286,7 @@ class gTranscribeWindow:
             self.settings_daemon.GrabMediaPlayerKeys('gTranscribe', 0)
 
     def play(self, action):
-        logging.debug('play action triggered')
+        logger.debug('play action triggered')
         if action.get_active():
             self.icon_play.set_from_stock(Gtk.STOCK_MEDIA_PAUSE, 2)
             # It's not resuming at the correct position if we don't set the
@@ -315,12 +315,12 @@ class gTranscribeWindow:
         try:
             self.position = self.player.position
         except:
-            logging.warn("query failed, can't get current position")
+            logger.warn("query failed, can't get current position")
             return False
         try:
             duration = self.player.duration
         except:
-            logging.warn("query failed, can't get file duration")
+            logger.warn("query failed, can't get file duration")
             return False
         self.set_position_label(duration, update_scale)
         if once:
@@ -365,7 +365,7 @@ class gTranscribeWindow:
             pos = self.text_buffer.get_text(
                 self.text_buffer.get_iter_at_offset(line_start - 10),
                 self.text_buffer.get_iter_at_offset(line_start - 1), True)
-            logging.debug('Try to get the position from %s', pos)
+            logger.debug('Try to get the position from %s', pos)
             pos_tag = re.compile('\[\d\d:\d\d.\d\]')
             if pos_tag.match(pos):
                 pos = pos[-8:-1]
@@ -374,7 +374,7 @@ class gTranscribeWindow:
                     self.player.position = time_to_ns(
                         datetime.datetime.strptime(pos, "%M:%S.%f"))
                     GObject.idle_add(self.play_loop, True)
-                    logging.debug('Set position')
+                    logger.debug('Set position')
 
     def on_scale_speed_format_value(self, widget, value, data=None):
         return u'%s\xd7' % locale.format('%.1f', value)
@@ -398,13 +398,13 @@ class gTranscribeWindow:
         GObject.idle_add(self.play_loop, True, False)
 
     def on_scale_position_button_press_event(self, widget, event):
-        logging.debug('Begin seeking')
+        logger.debug('Begin seeking')
         self.oldstate = self.player.state
         self.player.pause()
         self.seeking = True
 
     def on_scale_position_button_release_event(self, widget, event):
-        logging.debug('End seeking')
+        logger.debug('End seeking')
         self.seeking = False
         self.player.state = self.oldstate
         if not self.player.playing:
@@ -453,7 +453,7 @@ class gTranscribeWindow:
                 if hasattr(self, 'md5'):
                     # Try to get the last position
                     pos = text[-10:-1]
-                    logging.debug('Try to get the last position from %s', pos)
+                    logger.debug('Try to get the last position from %s', pos)
                     pos_tag = re.compile('\[\d\d:\d\d.\d\]')
                     if pos_tag.match(pos):
                         pos = pos[-8:-1]
@@ -462,7 +462,7 @@ class gTranscribeWindow:
                             self.player.position = time_to_ns(
                                 datetime.datetime.strptime(pos, "%M:%S.%f"))
                             GObject.idle_add(self.play_loop, True)
-                            logging.debug('Set position on load')
+                            logger.debug('Set position on load')
                 # disable the text view while loading the buffer with the text
                 self.text_view.set_sensitive(False)
                 self.text_buffer.set_text(text)
@@ -529,7 +529,8 @@ if __name__ == "__main__":
     # Set the logging level to show debug messages
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
-        logging.debug('logging enabled')
+        logger = logging.getLogger('root')
+        logger.debug('logging enabled')
 
     filepath = None
     if args.file and os.path.isfile(args.file):
