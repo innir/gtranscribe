@@ -69,12 +69,12 @@ class gTranscribeWindow:
 
         icon_theme = Gtk.IconTheme.get_default()
         if icon_theme.has_icon('gtranscribe'):
-            self.icon = icon_theme.load_icon('gtranscribe', 128, 0)
+            icon = icon_theme.load_icon('gtranscribe', 128, 0)
         else:
-            self.icon = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+            icon = GdkPixbuf.Pixbuf.new_from_file_at_scale(
                 get_data_file('icons', 'scalable', 'apps', 'gtranscribe.svg'),
                 128, 128, 0)
-        self.window.set_default_icon(self.icon)
+        self.window.set_default_icon(icon)
 
         self.text_view = builder.get_object("text_view")
         if SPELL_FALLBACK:
@@ -86,9 +86,9 @@ class gTranscribeWindow:
             Gspell.TextView.basic_setup(schecker)
         self.text_buffer = self.text_view.get_buffer()
 
-        self.spinbutton_jump = builder.get_object("spinbutton_jump")
-        self.spinbutton_jump.set_range(0, 5000)
-        self.spinbutton_jump.set_increments(10, 100)
+        spinbutton_jump = builder.get_object("spinbutton_jump")
+        spinbutton_jump.set_range(0, 5000)
+        spinbutton_jump.set_increments(10, 100)
 
         self.rewind_button = builder.get_object('button_seek_back')
         self.rewind_button.set_sensitive(False)
@@ -112,13 +112,12 @@ class gTranscribeWindow:
 
         self.dur_label = builder.get_object('label_duration')
         self.pos_label = builder.get_object('label_position')
-        self.time_str = '00:00.0'
-        self.dur_label.set_text(self.time_str)
-        self.pos_label.set_text(self.time_str)
+        time_str = '00:00.0'
+        self.dur_label.set_text(time_str)
+        self.pos_label.set_text(time_str)
 
         self.oldstate = None
         self.seeking = False
-        self.exact_seeking = True
         self._update_id = None
 
         self.filename = None
@@ -127,9 +126,10 @@ class gTranscribeWindow:
 
         # TODO: Make these configurable
         self.JUMP_BACK_INTERVAL = datetime.time(second=1)
-        self.JUMP_BACK = True
-        self.SEEK_INTERVAL = self.JUMP_BACK_INTERVAL
-        self.TIMESTAMP_FORMAT = "%s"  # allows formats like "[%s]", "<%s>", ...
+        self.SEEK_INTERVAL = datetime.time(second=1)
+
+        spinbutton_jump.set_value(time_to_ns(self.JUMP_BACK_INTERVAL) /
+                                       1000000)
 
         try:
             session_bus = dbus.SessionBus()
@@ -297,13 +297,8 @@ class gTranscribeWindow:
             self.window.update_ui = False
             self._set_update_ui(False)
             self.player.pause()
-            if self.JUMP_BACK:
-                interval = time_to_ns(self.JUMP_BACK_INTERVAL)
-                newpos = self.position - interval
-                if newpos < 0:
-                    newpos = 0
-                self.player.position = newpos
-                GObject.idle_add(self.play_loop, True)
+            self.player.move_position(-time_to_ns(self.JUMP_BACK_INTERVAL))
+            GObject.idle_add(self.play_loop, True)
             if hasattr(self, 'md5'):
                 fileinfo = FileInfo(self.player.filename, self.md5)
                 fileinfo.position = self.position
@@ -508,8 +503,6 @@ class gTranscribeWindow:
 
     # Run main application window
     def main(self):
-        self.spinbutton_jump.set_value(time_to_ns(self.JUMP_BACK_INTERVAL) /
-                                       1000000)
         self.window.connect('key_press_event', self.on_text_insert)
         self.window.show()
         Gtk.main()
