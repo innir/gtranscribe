@@ -48,7 +48,6 @@ PROJECT_ROOT_DIRECTORY = os.path.dirname(os.path.dirname(
 if PROJECT_ROOT_DIRECTORY not in sys.path:
     sys.path.insert(0, PROJECT_ROOT_DIRECTORY)
 
-from gtranscribe import AboutDialog
 from gtranscribe.helpers import *
 from gtranscribe.player import gTranscribePlayer
 from gtranscribe.fileinfo import FileInfo
@@ -123,7 +122,6 @@ class gTranscribeWindow:
         self._update_id = None
 
         self.filename = None
-        self.about_dialog = None
 
         self.position = 0
 
@@ -190,16 +188,20 @@ class gTranscribeWindow:
 
     update_ui = property(_get_update_ui, _set_update_ui)
 
-    # Called when the user clicks the 'About' menu. We use
-    # gtk_show_about_dialog() which is a convenience function
-    # to show a GtkAboutDialog. This dialog will NOT be modal
-    # but will be on top of the main application window.
     def about(self, action):
-        if self.about_dialog:
-            return
-        about_dialog = AboutDialog.AboutDialog(self)
+        about_dialog = Gtk.AboutDialog()
+        about_dialog.set_transient_for(self.window)
+        about_dialog.set_modal(True)
+        about_dialog.set_name("gTranscribe")
+        about_dialog.set_version("0.6")
+        about_dialog.set_copyright("Copyright 2013-2016 Philip Rinn\n"
+                                   "Copyright 2010 Frederik Elwert")
+        about_dialog.set_comments(_("gTranscribe is a software focussed "
+                                    "on easy transcription of spoken words."))
+        about_dialog.set_website("https://github.com/innir/gtranscribe")
+        about_dialog.set_authors(["Philip Rinn <rinni@inventati.org>"])
+        about_dialog.set_license_type(Gtk.License.GPL_3_0)
         about_dialog.show()
-        self.about_dialog = True
 
     def open(self, action):
         audiofile = get_open_filename(self, _('Open Audio File'),
