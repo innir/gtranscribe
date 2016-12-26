@@ -24,6 +24,7 @@ Gst.init(None)
 
 
 class gTranscribePlayer(Gst.Bin):
+    """Class to play audio files with Gstreamer."""
 
     __gtype_name__ = 'gTranscribePlayer'
 
@@ -40,6 +41,7 @@ class gTranscribePlayer(Gst.Bin):
         self.init_pipeline()
 
     def init_pipeline(self):
+        """Initialize the audio pipeline."""
         self.pipeline = Gst.Pipeline()
         self.audiosrc = Gst.ElementFactory.make('filesrc', None)
         self.decoder = Gst.ElementFactory.make('decodebin', None)
@@ -80,6 +82,7 @@ class gTranscribePlayer(Gst.Bin):
 
     @property
     def filename(self):
+        """Return the filename of the current stream."""
         return self.audiosrc.get_property('location')
 
     @property
@@ -99,6 +102,7 @@ class gTranscribePlayer(Gst.Bin):
         return pos[1]
 
     def _set_position(self, position):
+        """Set the position of the current stream."""
         self.pipeline.seek(self._rate,
                            Gst.Format.TIME,
                            Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE,
@@ -113,9 +117,11 @@ class gTranscribePlayer(Gst.Bin):
         return Gst.State.PLAYING == self.state
 
     def _get_rate(self):
+        """Get the playback speed of the current stream."""
         return self._rate
 
     def _set_rate(self, rate):
+        """Set the playback speed of the current stream."""
         self._rate = rate
         seek_type = Gst.SeekType.SET
         try:
@@ -132,18 +138,22 @@ class gTranscribePlayer(Gst.Bin):
     rate = property(_get_rate, _set_rate)
 
     def _get_state(self):
+        """Get the state of the audio pipeline."""
         return self.pipeline.get_state(0)[1]
 
     def _set_state(self, state):
+        """Set the state of the audio pipeline."""
         if not state == self.state:
             self.pipeline.set_state(state)
 
     state = property(_get_state, _set_state)
 
     def _get_volume(self):
+        """Get the volume of the current stream."""
         return self.volume1.get_property('volume')
 
     def _set_volume(self, volume):
+        """Set the volume of the current stream."""
         self.volume1.set_property('volume', volume)
 
     volume = property(_get_volume, _set_volume)
@@ -162,6 +172,7 @@ class gTranscribePlayer(Gst.Bin):
             self.emit('ready', self.filename)
 
     def on_message(self, bus, message):
+        """Handle message and react accordingly."""
         if message.type == Gst.MessageType.EOS:
             self.state = Gst.State.NULL
             self.emit('ended')
@@ -170,6 +181,7 @@ class gTranscribePlayer(Gst.Bin):
             self.state = Gst.State.NULL
 
     def open(self, filepath, duration=True):
+        """Open audio file and optionally query duration."""
         logger.debug('Opening file "%s"', filepath)
         self.state = Gst.State.READY
         self.audiosrc.set_property('location', filepath)
