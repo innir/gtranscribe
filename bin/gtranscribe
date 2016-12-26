@@ -206,11 +206,6 @@ class gTranscribeWindow:
                                       _('All Audio Files'), 'audio/*')
         self.open_file(audiofile)
 
-    def open_recent(self, item):
-        uri = item.get_current_uri()
-        path = uri_to_filepath(uri)
-        self.open_file(path)
-
     def open_file(self, filepath):
         self.play_action.set_active(False)
         self.slider.set_value(0)
@@ -234,7 +229,7 @@ class gTranscribeWindow:
         fileinfo = FileInfo(filepath, self.md5)
         if fileinfo.position:
             logger.debug('Resuming at position %s',
-                          ns_to_time(fileinfo.position))
+                         ns_to_time(fileinfo.position))
             self.player.position = fileinfo.position
             self.position = fileinfo.position
         if fileinfo.speed:
@@ -265,7 +260,7 @@ class gTranscribeWindow:
         logger.debug('received signal "ended"')
         # Automatically save text if a filename is given to avoid data loss
         if self.filename is not None:
-            self.on_save_menu_item_activate(self.window)
+            self.save_text(self.window)
         self.player.reset()
         self.play_action.set_active(False)
 

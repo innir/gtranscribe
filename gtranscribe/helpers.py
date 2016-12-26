@@ -21,7 +21,7 @@ import gettext
 from gettext import gettext as _
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio
+from gi.repository import Gtk
 gettext.textdomain('gTranscribe')
 
 
@@ -41,7 +41,7 @@ def ns_to_time(ns):
     Converts nanoseconds to a datetime.time object.
 
     :Parameters:
-        - `ns`: Nanoseconds as int.
+        - 'ns': Nanoseconds as int.
 
     :Return:
         - A datetime.time object.
@@ -61,7 +61,7 @@ def time_to_ns(time):
     Converts a datetime.time object to nanoseconds.
 
     :Parameters:
-        - `time`: A datetime.time object.
+        - 'time': A datetime.time object.
 
     :Return:
         - Nanoseconds as int.
@@ -74,17 +74,8 @@ def time_to_ns(time):
     return sum(values)
 
 
-def filepath_to_uri(path):
-    file = Gio.File.new_for_path(path)
-    return file.get_uri()
-
-
-def uri_to_filepath(uri):
-    file = Gio.File.new_for_uri(uri)
-    return file.get_path()
-
-
 def get_open_filename(self, title, filter_name, filter_mime):
+    """Displays a file open dialog and returns the filename."""
     filename = None
     chooser = Gtk.FileChooserDialog(title, self.window,
                                     Gtk.FileChooserAction.OPEN,
@@ -104,8 +95,9 @@ def get_open_filename(self, title, filter_name, filter_mime):
 
 
 def get_save_filename(self):
+    """Displays a file save dialog and returns the filename."""
     filename = None
-    chooser = Gtk.FileChooserDialog(_("Save File..."), self.window,
+    chooser = Gtk.FileChooserDialog(_("Save Text File"), self.window,
                                     Gtk.FileChooserAction.SAVE,
                                     (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                      Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
@@ -117,6 +109,7 @@ def get_save_filename(self):
 
 
 def error_message(self, message):
+    """Displays the string 'message' in an error dialog."""
     dialog = Gtk.MessageDialog(self.window,
                                Gtk.DialogFlags.MODAL |
                                Gtk.DialogFlags.DESTROY_WITH_PARENT,
@@ -127,6 +120,15 @@ def error_message(self, message):
 
 
 def md5_of_file(fname):
+    """
+    Calculate the md5 hash of the given file
+
+    :Parameters:
+        - 'fname': filename.
+
+    :Return:
+        - A string of length 32, containing the md5 hash as hexadecimal digits.
+    """
     md5 = hashlib.md5()
     f = open(fname, 'rb')
     while True:
@@ -139,6 +141,7 @@ def md5_of_file(fname):
 
 
 def get_data_file(*path_segments):
+    """Return the absolute path of the given data file."""
     # Where to look for data (ui and image files). By default,
     # this is ../data, relative your trunk layout
     data_directory = os.path.abspath(
