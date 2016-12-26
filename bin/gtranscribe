@@ -194,7 +194,7 @@ class gTranscribeWindow:
     # gtk_show_about_dialog() which is a convenience function
     # to show a GtkAboutDialog. This dialog will NOT be modal
     # but will be on top of the main application window.
-    def about(self, menuitem, data=None):
+    def about(self, action):
         if self.about_dialog:
             return
         about_dialog = AboutDialog.AboutDialog(self)
@@ -203,7 +203,7 @@ class gTranscribeWindow:
 
     def open(self, action):
         audiofile = get_open_filename(self, _('Open Audio File'),
-            _('All Audio Files'), 'audio/*')
+                                      _('All Audio Files'), 'audio/*')
         self.open_file(audiofile)
 
     def open_recent(self, item):
@@ -344,17 +344,11 @@ class gTranscribeWindow:
         self.speedscale.set_value(self.speedscale.get_value() + 0.1)
 
     def forward(self, action=None, user_data=None):
-        new_position = self.position + time_to_ns(self.SEEK_INTERVAL)
-        if new_position > self.player.duration:
-            new_position = self.player.duration
-        self.player.position = new_position
+        self.player.move_position(time_to_ns(self.SEEK_INTERVAL))
         GObject.idle_add(self.play_loop, True)
 
     def rewind(self, action=None, user_data=None):
-        new_position = self.position - time_to_ns(self.SEEK_INTERVAL)
-        if new_position < 0:
-            new_position = 0
-        self.player.position = new_position
+        self.player.move_position(-time_to_ns(self.SEEK_INTERVAL))
         GObject.idle_add(self.play_loop, True)
 
     def jump(self, action):
@@ -381,11 +375,6 @@ class gTranscribeWindow:
                         datetime.datetime.strptime(pos, "%M:%S.%f"))
                     GObject.idle_add(self.play_loop, True)
                     logging.debug('Set position')
-
-    def copy_position(self, action):
-        pos_str = trim(ns_to_time(self.position).strftime(self.time_str))
-        clipboard = Gtk.clipboard_get()
-        clipboard.set_text(self.TIMESTAMP_FORMAT % pos_str)
 
     def on_scale_speed_format_value(self, widget, value, data=None):
         return u'%s\xd7' % locale.format('%.1f', value)
@@ -446,15 +435,14 @@ class gTranscribeWindow:
     def on_jump_value_changed(self, range):
         self.JUMP_BACK_INTERVAL = ns_to_time(range.get_value_as_int() *
                                              1000000)
-        self.SEEK_INTERVAL = self.JUMP_BACK_INTERVAL
 
     # Called when the user clicks the 'Open' menu. We need to prompt for save
     # if the file has been modified, allow the user to choose a file to open,
     # and then load it into the buffer for the GtkTextView.
     # The previous contents is overwritten.
-    def on_open_menu_item_activate(self, menuitem, data=None):
+    def open_text(self, action):
         self.filename = get_open_filename(self, _("Open Text File"),
-            _('Plain Text Files'), 'text/plain')
+                                          _('Plain Text Files'), 'text/plain')
         if self.filename:
             try:
                 # get the file contents
@@ -490,7 +478,7 @@ class gTranscribeWindow:
 
     # Called when the user clicks the 'Save' menu. We need to allow the user to
     # choose a file to save if it's an untitled document
-    def on_save_menu_item_activate(self, menuitem, data=None):
+    def save_text(self, action):
         if self.filename is None:
             self.filename = get_save_filename(self)
         try:

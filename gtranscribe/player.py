@@ -206,3 +206,9 @@ class gTranscribePlayer(Gst.Bin):
     def pause(self):
         """Pause playback."""
         self.state = Gst.State.PAUSED
+
+    def move_position(self, amount):
+        """Move playback position."""
+        new_position = self.position + amount
+        # Clamp new_position between 0 and self.duration
+        self.position = max(min(new_position, self.duration), 0)
