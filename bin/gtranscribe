@@ -153,10 +153,10 @@ class gTranscribeWindow:
         self.player.connect('ready', self.on_file_ready)
         self.player.connect('ended', self.on_file_ended)
 
-        if filepath:
+        if audiofile:
             # Open a file passed as command-line parameter.
             # Use idle_add so window is settled.
-            GObject.idle_add(self.open_file, filepath)
+            GObject.idle_add(self.open_file, audiofile)
 
     def _get_update_ui(self):
         return self._update_id is not None
@@ -194,23 +194,24 @@ class gTranscribeWindow:
     def open(self, action):
         audiofile = get_open_filename(self, _('Open Audio File'),
                                       _('All Audio Files'), 'audio/*')
-        self.open_file(audiofile)
+        if audiofile is not None:
+            self.open_file(audiofile)
 
-    def open_file(self, filepath):
+    def open_file(self, audiofile):
         self.play_action.set_active(False)
         self.slider.set_value(0)
-        self.md5 = md5_of_file(filepath)
+        self.md5 = md5_of_file(audiofile)
         # insert md5 into database so we can just update afterwards
         MetaData.store_md5(self.md5)
-        self.player.open(filepath)
+        self.player.open(audiofile)
 
-    def on_file_ready(self, signal, filepath):
+    def on_file_ready(self, signal, audiofile):
         logger.debug('received signal "ready"')
-        GObject.idle_add(self.update_file, filepath)
+        GObject.idle_add(self.update_file, audiofile)
 
-    def update_file(self, filepath):
+    def update_file(self, audiofile):
         self.position = 0
-        fileinfo = MetaData(filepath, self.md5)
+        fileinfo = MetaData(audiofile, self.md5)
         if fileinfo.position:
             logger.debug('Resuming at position %s',
                          ns_to_time(fileinfo.position))
@@ -230,7 +231,7 @@ class gTranscribeWindow:
         # set position
         self.set_position_label(time_to_ns(duration))
         # set window title
-        filename = os.path.basename(filepath)
+        filename = os.path.basename(audiofile)
         self.window.set_title(u'gTranscribe \u2013 %s' % filename)
         self.play_action.set_sensitive(True)
         self.slider.set_sensitive(True)
@@ -398,11 +399,11 @@ class gTranscribeWindow:
     def on_destroy(self, widget, data=None):
         """Called when the gTranscribeWindow is closed."""
         # Clean up code for saving application state should be added here.
-        if self.player.filename:
+        if self.player.filename is not None:
             fileinfo = MetaData(self.player.filename, self.md5)
             fileinfo.position = self.position
             fileinfo.speed = self.player.rate
-        if self.settings_daemon:
+        if self.settings_daemon is not None:
             self.settings_daemon.ReleaseMediaPlayerKeys('gTranscribe')
         Gtk.main_quit()
 
@@ -410,45 +411,39 @@ class gTranscribeWindow:
         self.JUMP_BACK_INTERVAL = ns_to_time(range.get_value_as_int() *
                                              1000000)
 
-    # Called when the user clicks the 'Open' menu. We need to prompt for save
-    # if the file has been modified, allow the user to choose a file to open,
-    # and then load it into the buffer for the GtkTextView.
-    # The previous contents is overwritten.
+    # Called when the user clicks the 'Open Text File' menu.
+    # The previous contents of the GtkTextView is overwritten.
     def open_text(self, action):
+        self.filename = None
         self.filename = get_open_filename(self, _("Open Text File"),
                                           _('Plain Text Files'), 'text/plain')
-        if self.filename:
-            try:
-                # get the file contents
-                fin = open(self.filename, "r")
-                text = fin.read()
-                fin.close()
-                # Only do this if an audio file is already loaded
-                if hasattr(self, 'md5'):
-                    # Try to get the last position
-                    pos = text[-10:-1]
-                    logger.debug('Try to get the last position from %s', pos)
-                    pos_tag = re.compile('\[\d\d:\d\d.\d\]')
+        if self.filename is not None:
+            # get the file contents
+            fin = open(self.filename, "r")
+            text = fin.read()
+            fin.close()
+            # Only do this if an audio file is already loaded
+            if hasattr(self, 'md5'):
+                # Try to get the last position
+                pos = text[-10:-1]
+                logger.debug('Try to get the last position from %s', pos)
+                pos_tag = re.compile('\[\d\d:\d\d.\d\]')
+                if pos_tag.match(pos):
+                    pos = pos[-8:-1]
+                    pos_tag = re.compile('\d\d:\d\d.\d')
                     if pos_tag.match(pos):
-                        pos = pos[-8:-1]
-                        pos_tag = re.compile('\d\d:\d\d.\d')
-                        if pos_tag.match(pos):
-                            self.player.position = time_to_ns(
-                                datetime.datetime.strptime(pos, "%M:%S.%f"))
-                            GObject.idle_add(self.play_loop, True)
-                            logger.debug('Set position on load')
-                # disable the text view while loading the buffer with the text
-                self.text_view.set_sensitive(False)
-                self.text_buffer.set_text(text)
-                self.text_buffer.set_modified(False)
-                self.text_view.set_sensitive(True)
-                self.text_view.grab_focus()
-                GObject.idle_add(self.text_view.scroll_mark_onscreen,
-                                 self.text_buffer.get_insert())
-            except:
-                # error loading file, show message to user
-                error_message(self, "Could not open file: %s" % self.filename)
-                self.filename = None
+                        self.player.position = time_to_ns(
+                            datetime.datetime.strptime(pos, "%M:%S.%f"))
+                        GObject.idle_add(self.play_loop, True)
+                        logger.debug('Set position on load')
+            # disable the text view while loading the buffer with the text
+            self.text_view.set_sensitive(False)
+            self.text_buffer.set_text(text)
+            self.text_buffer.set_modified(False)
+            self.text_view.set_sensitive(True)
+            self.text_view.grab_focus()
+            GObject.idle_add(self.text_view.scroll_mark_onscreen,
+                             self.text_buffer.get_insert())
 
     # Called when the user clicks the 'Save' menu. We need to allow the user to
     # choose a file to save if it's an untitled document
@@ -504,9 +499,9 @@ if __name__ == "__main__":
         logger = logging.getLogger('root')
         logger.debug('logging enabled')
 
-    filepath = None
+    audiofile = None
     if args.file and os.path.isfile(args.file):
-        filepath = args.file
+        audiofile = args.file
 
     # Catch Ctrl+C and quit the program
     signal.signal(signal.SIGINT, lambda a, b: gtranscriber.quit(gtranscriber))
