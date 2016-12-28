@@ -349,6 +349,8 @@ class gTranscribeWindow:
                     self.player.position = time_to_ns(
                         datetime.datetime.strptime(pos, "%M:%S.%f"))
                     GObject.idle_add(self.play_loop, True)
+                    self.text_buffer.place_cursor(
+                         self.text_buffer.get_iter_at_offset(line_start))
                     logger.debug('Set position')
 
     def on_scale_speed_format_value(self, widget, value, data=None):
