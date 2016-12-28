@@ -3,7 +3,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gTranscribe 0.6\n"
+"Project-Id-Version: gTranscribe 0.7\n"
 "Report-Msgid-Bugs-To: rinni@inventati.org\n"
 "POT-Creation-Date: 2016-12-28 15:24+0100\n"
 "PO-Revision-Date: 2016-12-28 17:59+0100\n"
