@@ -124,15 +124,15 @@ class gTranscribePlayer(Gst.Bin):
         """Set the playback speed of the current stream."""
         self._rate = rate
         seek_type = Gst.SeekType.SET
-        try:
-            pos = self.pipeline.query_position(Gst.Format.TIME)[1]
-        except:
+        pos = self.pipeline.query_position(Gst.Format.TIME)
+        # Position query was not successful
+        if pos[0] == 0:
             seek_type = Gst.SeekType.NONE
-            pos = -1
+            pos[1] = -1
         self.pipeline.seek(rate,
                            Gst.Format.TIME,
                            Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE,
-                           seek_type, pos,
+                           seek_type, pos[1],
                            Gst.SeekType.NONE, -1)
 
     rate = property(_get_rate, _set_rate)
