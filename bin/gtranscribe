@@ -49,7 +49,7 @@ if PROJECT_ROOT_DIRECTORY not in sys.path:
 
 from gtranscribe.helpers import *
 from gtranscribe.player import gTranscribePlayer
-from gtranscribe.metadata import MetaData
+from gtranscribe.metadata import MetaData, init_db
 
 GObject.threads_init()
 locale.setlocale(locale.LC_ALL, '')
@@ -131,7 +131,7 @@ class gTranscribeWindow:
                                   1000000)
 
         # Initialize database for meta data
-        MetaData.init_db()
+        init_db()
 
         try:
             session_bus = dbus.SessionBus()
@@ -202,7 +202,7 @@ class gTranscribeWindow:
         self.slider.set_value(0)
         self.md5 = md5_of_file(audiofile)
         # insert md5 into database so we can just update afterwards
-        MetaData.store_md5(self.md5)
+        MetaData.store_md5(self)
         self.player.open(audiofile)
 
     def on_file_ready(self, signal, audiofile):

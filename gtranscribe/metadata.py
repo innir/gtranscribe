@@ -92,25 +92,26 @@ class MetaData(object):
     position = property(_get_position, _set_position)
     speed = property(_get_speed, _set_speed)
 
-    def init_db():
-        """Create the database for meta data if necesary."""
-        # make sure our cache directory exists
-        if not os.path.exists(cache_dir):
-            os.makedirs(cache_dir)
-
-        con = sqlite3.connect(database)
-        cur = con.cursor()
-        cur.execute('CREATE TABLE IF NOT EXISTS metadata(md5 TEXT PRIMARY KEY,\
-                    position INTEGER, speed REAL)')
-        con.commit()
-        cur.close()
-        con.close()
-
-    def store_md5(md5):
+    def store_md5(self):
         """Store the given md5 hash in the database for meta data."""
         con = sqlite3.connect(database)
         cur = con.cursor()
-        cur.execute('INSERT OR IGNORE INTO metadata (md5) VALUES (?)', (md5,))
+        cur.execute('INSERT OR IGNORE INTO metadata (md5) VALUES (?)',
+                    (self.md5,))
         con.commit()
         cur.close()
         con.close()
+
+def init_db():
+    """Create the database for meta data if necesary."""
+    # make sure our cache directory exists
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    cur.execute('CREATE TABLE IF NOT EXISTS metadata(md5 TEXT PRIMARY KEY,\
+                position INTEGER, speed REAL)')
+    con.commit()
+    cur.close()
+    con.close()
