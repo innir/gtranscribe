@@ -140,16 +140,14 @@ def md5_of_file(fname):
     return md5.hexdigest()
 
 
-def get_data_file(*path_segments):
+def get_data_file(root_dir, *path_segments):
     """Return the absolute path of the given data file."""
     # Where to look for data (ui and image files). By default,
     # this is ../data, relative your trunk layout
-    data_directory = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '../data/'))
+    data_directory = os.path.join(root_dir, 'data/')
 
     # If this path does not exist fall back to system wide directory
     if not os.path.exists(data_directory):
-        data_directory = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), '../share/gTranscribe/'))
+        data_directory = os.path.join(root_dir, 'share/gTranscribe/')
 
     return os.path.join(data_directory, *path_segments)

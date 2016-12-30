@@ -62,7 +62,8 @@ class gTranscribeWindow:
     def __init__(self):
         builder = Gtk.Builder()
         builder.set_translation_domain('gTranscribe')
-        builder.add_from_file(get_data_file('ui', 'gTranscribe.glade'))
+        builder.add_from_file(get_data_file(PROJECT_ROOT_DIRECTORY, 'ui',
+                                            'gTranscribe.glade'))
         builder.connect_signals(self)
         self.window = builder.get_object("gtranscribe_window")
 
@@ -71,8 +72,8 @@ class gTranscribeWindow:
             icon = icon_theme.load_icon('gtranscribe', 128, 0)
         else:
             icon = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                get_data_file('icons', 'scalable', 'apps', 'gtranscribe.svg'),
-                128, 128, 0)
+                get_data_file(PROJECT_ROOT_DIRECTORY, 'icons', 'scalable',
+                              'apps', 'gtranscribe.svg'), 128, 128, 0)
         self.window.set_default_icon(icon)
 
         self.text_view = builder.get_object("text_view")
