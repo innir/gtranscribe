@@ -1,3 +1,14 @@
+gTranscribe 0.7.1 Release Notes
+=============================
+
+Bug fixes
+---------
+
+  * Use correct root directory when searching for data files.
+    [[0d11280](https://github.com/innir/gtranscribe/commit/0d1128074e4def421db6c3d1fd396c98a045fac0)]
+
+
+
 gTranscribe 0.7 Release Notes
 =============================
 
