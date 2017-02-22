@@ -496,10 +496,10 @@ if __name__ == "__main__":
     parser.add_argument("file", nargs='?', help=_("Audio file to load"))
     args = parser.parse_args()
 
+    logger = logging.getLogger('root')
     # Set the logging level to show debug messages
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
-        logger = logging.getLogger('root')
         logger.debug('logging enabled')
 
     audiofile = None
