@@ -101,6 +101,7 @@ def get_save_filename(self):
                                     Gtk.FileChooserAction.SAVE,
                                     (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                      Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+    chooser.set_do_overwrite_confirmation(True)
     response = chooser.run()
     if response == Gtk.ResponseType.OK:
         filename = chooser.get_filename()
