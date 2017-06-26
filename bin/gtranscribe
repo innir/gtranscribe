@@ -471,7 +471,7 @@ class gTranscribeWindow:
 
     def on_text_insert(self, widget, event):
         keyname = Gdk.keyval_name(event.keyval)
-        if keyname == 'Return':
+        if keyname == 'Return' and self.position > 0:
             pos_str = ' [' + trim(
                 ns_to_time(self.position).strftime(self.time_str)) + ']'
             self.text_buffer.insert_at_cursor(pos_str)
