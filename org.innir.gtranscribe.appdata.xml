@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component>
-  <id type="desktop">gtranscribe.desktop</id>
+<component type="desktop">
+  <id>org.innir.gtranscribe.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <developer_name>Philip Rinn</developer_name>
   <name>gTranscribe</name>
-  <summary>
-    A simple GTK+ tool focussed on easy transcription of spoken words
-  </summary>
+  <summary>A simple GTK+ tool focussed on easy transcription of spoken words</summary>
   <description>
     <p>
       gTranscribe is a simple GTK+ tool to transcribe audio files and other
