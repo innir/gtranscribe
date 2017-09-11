@@ -103,7 +103,7 @@ class MetaData(object):
         con.close()
 
 def init_db():
-    """Create the database for meta data if necesary."""
+    """Create the database for meta data if necessary."""
     # make sure our cache directory exists
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)
