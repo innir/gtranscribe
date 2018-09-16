@@ -1,3 +1,42 @@
+gTranscribe 0.8 Release Notes
+=============================
+
+Changed behavior
+------------
+
+  * Remap key bindings for search:
+    Change key bindings for forward/rewind from <CTRL>Left/Right to
+    <CRTL><SHIFT>Left/Right so the standard key bindings for moving one
+    word backwards/forwards are still usable.
+    [[d8c7ef2](https://github.com/innir/gtranscribe/commit/d8c7ef29f6cd200202f34df6597e2bcce3ec80d4)]
+
+
+New features
+------------
+
+  * Add timestamp when pressing F8.
+    [[7ed0575](https://github.com/innir/gtranscribe/commit/7ed05758c550c3f8c0d0fb6d73d26ce705c0f771)]
+
+  * Use the de facto standard as timestamp format to make it easier to use the
+    output with popular text analysis software. Don't worry, the old format is
+    still recognized.
+    [[68169a8](https://github.com/innir/gtranscribe/commit/68169a8d968f98f587a137c4c039ca89b09cf369)]
+
+
+Bug fixes
+---------
+
+  * Fix loading of audio files.
+    [[8c1da0f](https://github.com/innir/gtranscribe/commit/8c1da0f705edd1915aced4fa2359b76ca662a3ae)]
+
+  * Enable override warning in save dialog.
+    [[f037de6](https://github.com/innir/gtranscribe/commit/f037de662a4204f19e35744c0d1d62b4da7211a2)]
+
+  * Only insert timestamp if not at start of file.
+    [[b99a96b](https://github.com/innir/gtranscribe/commit/b99a96b3952ec99e284a1a285d0d99a96ced22b0)]
+
+
+
 gTranscribe 0.7.1 Release Notes
 =============================
 
