@@ -17,6 +17,7 @@
 import os.path
 import datetime
 import hashlib
+import re
 import gettext
 from gettext import gettext as _
 import gi
@@ -29,7 +30,7 @@ def trim(timestring, digits=1):
     """
     Trim a time string to contain only a given number of digits
     """
-    pos = timestring.find('.')
+    pos = re.search("[.-]", timestring).start()
     if pos > -1:
         return timestring[:pos + 1 + digits]
     else:

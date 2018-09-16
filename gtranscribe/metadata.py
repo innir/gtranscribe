@@ -102,6 +102,7 @@ class MetaData(object):
         cur.close()
         con.close()
 
+
 def init_db():
     """Create the database for meta data if necessary."""
     # make sure our cache directory exists
