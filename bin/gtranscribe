@@ -103,6 +103,7 @@ class gTranscribeWindow:
         self.jump_menu.set_sensitive(False)
 
         self.speedscale = builder.get_object('scale_speed')
+        self.speedscale.set_sensitive(False)
 
         self.play_action = builder.get_object("action_play")
         self.play_action.set_sensitive(False)
@@ -241,6 +242,7 @@ class gTranscribeWindow:
         self.rewind_menu.set_sensitive(True)
         self.forward_menu.set_sensitive(True)
         self.jump_menu.set_sensitive(True)
+        self.speedscale.set_sensitive(True)
 
     def on_file_ended(self, signal):
         logger.debug('received signal "ended"')
