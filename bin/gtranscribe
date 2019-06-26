@@ -191,7 +191,8 @@ class gTranscribeWindow:
         about_dialog.set_website("https://github.com/innir/gtranscribe")
         about_dialog.set_authors(["Philip Rinn <rinni@inventati.org>"])
         about_dialog.set_license_type(Gtk.License.GPL_3_0)
-        about_dialog.show()
+        about_dialog.run()
+        about_dialog.destroy()
 
     def open(self, action):
         audiofile = get_open_filename(self, _('Open Audio File'),
