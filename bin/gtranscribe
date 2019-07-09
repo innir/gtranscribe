@@ -26,7 +26,7 @@ from gettext import gettext as _
 import dbus
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, GObject, Gtk, Gdk, GdkPixbuf
+from gi.repository import GLib, Gtk, Gdk, GdkPixbuf
 try:
     gi.require_version('Gspell', '1')
     from gi.repository import Gspell
@@ -51,7 +51,6 @@ from gtranscribe.helpers import *
 from gtranscribe.player import gTranscribePlayer
 from gtranscribe.metadata import MetaData, init_db
 
-GObject.threads_init()
 locale.setlocale(locale.LC_ALL, '')
 gettext.textdomain('gTranscribe')
 DBusGMainLoop(set_as_default=True)
@@ -105,8 +104,10 @@ class gTranscribeWindow:
         self.speedscale = builder.get_object('scale_speed')
         self.speedscale.set_sensitive(False)
 
-        self.play_action = builder.get_object("action_play")
+        self.play_action = builder.get_object("button_play")
         self.play_action.set_sensitive(False)
+        self.play_menu = builder.get_object('play')
+        self.play_menu.set_sensitive(False)
         self.slider = builder.get_object('scale_position')
         self.slider.set_sensitive(False)
         self.icon_play = builder.get_object("icon_play")
@@ -158,19 +159,19 @@ class gTranscribeWindow:
         if audiofile:
             # Open a file passed as command-line parameter.
             # Use idle_add so window is settled.
-            GObject.idle_add(self.open_file, audiofile)
+            GLib.idle_add(self.open_file, audiofile)
 
     def _get_update_ui(self):
         return self._update_id is not None
 
     def _set_update_ui(self, update):
         if update:
-            self._update_id = GObject.timeout_add(50, self.play_loop)
+            self._update_id = GLib.timeout_add(50, self.play_loop)
         else:
             # run play_loop one more time to make sure UI is up to date.
             self.play_loop()
             try:
-                GObject.source_remove(self._update_id)
+                GLib.source_remove(self._update_id)
             except TypeError:
                 # source no longer available, do nothing
                 pass
@@ -183,8 +184,8 @@ class gTranscribeWindow:
         about_dialog.set_transient_for(self.window)
         about_dialog.set_modal(True)
         about_dialog.set_name("gTranscribe")
-        about_dialog.set_version("0.7.1")
-        about_dialog.set_copyright("Copyright \u00A9 2013-2016 Philip Rinn\n"
+        about_dialog.set_version("0.8")
+        about_dialog.set_copyright("Copyright \u00A9 2013-2018 Philip Rinn\n"
                                    "Copyright \u00A9 2010 Frederik Elwert")
         about_dialog.set_comments(_("gTranscribe is a software focussed "
                                     "on easy transcription of spoken words."))
@@ -210,7 +211,7 @@ class gTranscribeWindow:
 
     def on_file_ready(self, signal, audiofile):
         logger.debug('received signal "ready"')
-        GObject.idle_add(self.update_file, audiofile)
+        GLib.idle_add(self.update_file, audiofile)
 
     def update_file(self, audiofile):
         self.position = 0
@@ -240,6 +241,7 @@ class gTranscribeWindow:
         self.slider.set_sensitive(True)
         self.rewind_button.set_sensitive(True)
         self.forward_button.set_sensitive(True)
+        self.play_menu.set_sensitive(True)
         self.rewind_menu.set_sensitive(True)
         self.forward_menu.set_sensitive(True)
         self.jump_menu.set_sensitive(True)
@@ -272,7 +274,7 @@ class gTranscribeWindow:
     def play(self, action):
         logger.debug('play action triggered')
         if action.get_active():
-            self.icon_play.set_from_stock(Gtk.STOCK_MEDIA_PAUSE, 2)
+            self.icon_play.set_from_icon_name(Gtk.STOCK_MEDIA_PAUSE, 2)
             # It's not resuming at the correct position if we don't set the
             # position explicitly
             self.player.position = self.position
@@ -280,12 +282,12 @@ class gTranscribeWindow:
             self.window.update_ui = True
             self._set_update_ui(True)
         else:
-            self.icon_play.set_from_stock(Gtk.STOCK_MEDIA_PLAY, 2)
+            self.icon_play.set_from_icon_name(Gtk.STOCK_MEDIA_PLAY, 2)
             self.window.update_ui = False
             self._set_update_ui(False)
             self.player.pause()
             self.player.move_position(-time_to_ns(self.JUMP_BACK_INTERVAL))
-            GObject.idle_add(self.play_loop, True)
+            GLib.idle_add(self.play_loop, True)
             if hasattr(self, 'md5'):
                 fileinfo = MetaData(self.player.filename, self.md5)
                 fileinfo.position = self.position
@@ -324,11 +326,11 @@ class gTranscribeWindow:
 
     def forward(self, action=None, user_data=None):
         self.player.move_position(time_to_ns(self.SEEK_INTERVAL))
-        GObject.idle_add(self.play_loop, True)
+        GLib.idle_add(self.play_loop, True)
 
     def rewind(self, action=None, user_data=None):
         self.player.move_position(-time_to_ns(self.SEEK_INTERVAL))
-        GObject.idle_add(self.play_loop, True)
+        GLib.idle_add(self.play_loop, True)
 
     def jump(self, action):
         # Only do this if an audio file is already loaded
@@ -352,13 +354,13 @@ class gTranscribeWindow:
                 if pos_tag.match(pos):
                     self.player.position = time_to_ns(
                         datetime.datetime.strptime(pos, "%M:%S.%f"))
-                    GObject.idle_add(self.play_loop, True)
+                    GLib.idle_add(self.play_loop, True)
                     self.text_buffer.place_cursor(
                          self.text_buffer.get_iter_at_offset(line_start))
                     logger.debug('Set position')
 
     def on_scale_speed_format_value(self, widget, value, data=None):
-        return u'%s\xd7' % locale.format('%.1f', value)
+        return u'%s\xd7' % locale.format_string('%.1f', value)
 
     def on_scale_speed_value_changed(self, range):
         value = range.get_value()
@@ -376,7 +378,7 @@ class gTranscribeWindow:
         new_position = self.player.duration * (value / max_value)
         self.player.position = new_position
         # Update only position label
-        GObject.idle_add(self.play_loop, True, False)
+        GLib.idle_add(self.play_loop, True, False)
 
     def on_scale_position_button_press_event(self, widget, event):
         logger.debug('Begin seeking')
@@ -442,7 +444,7 @@ class gTranscribeWindow:
                         time_str = "%M:%S.%f"
                     self.player.position = time_to_ns(
                         datetime.datetime.strptime(pos, time_str))
-                    GObject.idle_add(self.play_loop, True)
+                    GLib.idle_add(self.play_loop, True)
                     logger.debug('Set position on load to %s', pos)
             # disable the text view while loading the buffer with the text
             self.text_view.set_sensitive(False)
@@ -450,7 +452,7 @@ class gTranscribeWindow:
             self.text_buffer.set_modified(False)
             self.text_view.set_sensitive(True)
             self.text_view.grab_focus()
-            GObject.idle_add(self.text_view.scroll_mark_onscreen,
+            GLib.idle_add(self.text_view.scroll_mark_onscreen,
                              self.text_buffer.get_insert())
 
     # Called when the user clicks the 'Save' menu. We need to allow the user to

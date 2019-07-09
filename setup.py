@@ -16,8 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import DistUtilsExtra.auto
-assert DistUtilsExtra.auto.__version__ >= '2.22', 'gTranscribe needs '\
-                                                  'DistUtilsExtra.auto >= 2.22'
 
 DistUtilsExtra.auto.setup(
     name='gTranscribe',

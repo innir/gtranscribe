@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.0 -->
+<!-- Generated with glade 3.22.1 -->
 <interface>
-  <requires lib="gtk+" version="3.0"/>
-  <object class="GtkToggleAction" id="action_play">
-    <signal name="toggled" handler="play" swapped="no"/>
-  </object>
+  <requires lib="gtk+" version="3.12"/>
   <object class="GtkAdjustment" id="adjustment_seek">
     <property name="upper">1</property>
     <property name="step_increment">0.10000000000000001</property>
@@ -39,6 +36,9 @@
     <property name="default_height">550</property>
     <signal name="delete-event" handler="quit" swapped="no"/>
     <signal name="destroy" handler="quit" swapped="no"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <object class="GtkBox" id="window">
         <property name="visible">True</property>
@@ -127,12 +127,11 @@
                     <child>
                       <object class="GtkImageMenuItem" id="play">
                         <property name="label">gtk-media-play</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="related_action">action_play</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <signal name="activate" handler="play" object="button_play" swapped="no"/>
                         <accelerator key="space" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
@@ -333,12 +332,11 @@
             <property name="spacing">4</property>
             <child>
               <object class="GtkToggleButton" id="button_play">
-                <property name="use_action_appearance">False</property>
-                <property name="related_action">action_play</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
+                <signal name="toggled" handler="play" swapped="no"/>
                 <child>
                   <object class="GtkImage" id="icon_play">
                     <property name="visible">True</property>
