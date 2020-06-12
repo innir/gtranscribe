@@ -5,7 +5,7 @@
   <project_license>GPL-3.0+</project_license>
   <developer_name>Philip Rinn</developer_name>
   <name>gTranscribe</name>
-  <summary>A simple GTK+ tool focussed on easy transcription of spoken words</summary>
+  <summary>A simple GTK+ tool focused on easy transcription of spoken words</summary>
   <description>
     <p>
       gTranscribe is a simple GTK+ tool to transcribe audio files and other

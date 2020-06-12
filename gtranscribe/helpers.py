@@ -1,5 +1,5 @@
-# gTranscribe is a software focussed on easy transcription of spoken words.
-# Copyright (C) 2013-2018 Philip Rinn <rinni@inventati.org>
+# gTranscribe is a software focused on easy transcription of spoken words.
+# Copyright (C) 2013-2020 Philip Rinn <rinni@inventati.org>
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+#pylint: disable=wrong-import-position
 import os.path
 import datetime
-import hashlib
+from hashlib import md5
 import re
 import gettext
 from gettext import gettext as _
@@ -27,19 +28,16 @@ gettext.textdomain('gTranscribe')
 
 
 def trim(timestring, digits=1):
-    """
-    Trim a time string to contain only a given number of digits
-    """
+    """Trim a time string to contain only a given number of digits."""
     pos = re.search("[.-]", timestring).start()
     if pos > -1:
         return timestring[:pos + 1 + digits]
-    else:
-        return timestring
+    return timestring
 
 
 def ns_to_time(ns):
     """
-    Converts nanoseconds to a datetime.time object.
+    Convert nanoseconds to a datetime.time object.
 
     :Parameters:
         - 'ns': Nanoseconds as int.
@@ -59,7 +57,7 @@ def ns_to_time(ns):
 
 def time_to_ns(time):
     """
-    Converts a datetime.time object to nanoseconds.
+    Convert a datetime.time object to nanoseconds.
 
     :Parameters:
         - 'time': A datetime.time object.
@@ -76,7 +74,7 @@ def time_to_ns(time):
 
 
 def get_open_filename(self, title, filter_name, filter_mime):
-    """Displays a file open dialog and returns the filename."""
+    """Display a file open dialog and returns the filename."""
     filename = None
     chooser = Gtk.FileChooserDialog(title, self.window,
                                     Gtk.FileChooserAction.OPEN,
@@ -96,7 +94,7 @@ def get_open_filename(self, title, filter_name, filter_mime):
 
 
 def get_save_filename(self):
-    """Displays a file save dialog and returns the filename."""
+    """Display a file save dialog and returns the filename."""
     filename = None
     chooser = Gtk.FileChooserDialog(_("Save Text File"), self.window,
                                     Gtk.FileChooserAction.SAVE,
@@ -111,7 +109,7 @@ def get_save_filename(self):
 
 
 def error_message(self, message):
-    """Displays the string 'message' in an error dialog."""
+    """Display the string 'message' in an error dialog."""
     dialog = Gtk.MessageDialog(self.window,
                                Gtk.DialogFlags.MODAL |
                                Gtk.DialogFlags.DESTROY_WITH_PARENT,
@@ -123,7 +121,7 @@ def error_message(self, message):
 
 def md5_of_file(fname):
     """
-    Calculate the md5 hash of the given file
+    Calculate the md5 hash of the given file.
 
     :Parameters:
         - 'fname': filename.
@@ -131,15 +129,11 @@ def md5_of_file(fname):
     :Return:
         - A string of length 32, containing the md5 hash as hexadecimal digits.
     """
-    md5 = hashlib.md5()
-    f = open(fname, 'rb')
-    while True:
-        data = f.read(81920)
-        if not data:
-            break
-        md5.update(data)
-    f.close()
-    return md5.hexdigest()
+    md5_hash = md5()
+    with open(fname, "rb") as data:
+        for chunk in iter(lambda: data.read(81920), b""):
+            md5_hash.update(chunk)
+    return md5_hash.hexdigest()
 
 
 def get_data_file(root_dir, *path_segments):

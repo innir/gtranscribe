@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.22.2 -->
 <interface>
   <requires lib="gtk+" version="3.12"/>
   <object class="GtkAdjustment" id="adjustment_seek">
@@ -14,21 +14,6 @@
     <property name="step_increment">0.10000000000000001</property>
     <property name="page_increment">0.10000000000000001</property>
   </object>
-  <object class="GtkImage" id="image2">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-file</property>
-  </object>
-  <object class="GtkImage" id="image4">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-go-down</property>
-  </object>
-  <object class="GtkImage" id="image5">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-go-up</property>
-  </object>
   <object class="GtkWindow" id="gtranscribe_window">
     <property name="can_focus">False</property>
     <property name="title">gTranscribe</property>
@@ -36,7 +21,7 @@
     <property name="default_height">550</property>
     <signal name="delete-event" handler="quit" swapped="no"/>
     <signal name="destroy" handler="quit" swapped="no"/>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child>
@@ -61,34 +46,30 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="open">
-                        <property name="label">gtk-open</property>
+                      <object class="GtkMenuItem" id="open">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Open</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                         <signal name="activate" handler="open" swapped="no"/>
                         <accelerator key="o" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="open_text">
-                        <property name="label" translatable="yes">Open Text</property>
+                      <object class="GtkMenuItem" id="open_text">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Open Text</property>
                         <property name="use_underline">True</property>
-                        <property name="image">image2</property>
-                        <property name="use_stock">False</property>
                         <signal name="activate" handler="open_text" swapped="no"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="save">
-                        <property name="label">gtk-save</property>
+                      <object class="GtkMenuItem" id="save">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Save</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                         <signal name="activate" handler="save_text" swapped="no"/>
                         <accelerator key="s" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
@@ -100,12 +81,11 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="quit">
-                        <property name="label">gtk-quit</property>
+                      <object class="GtkMenuItem" id="quit">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Quit</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                         <signal name="activate" handler="quit" swapped="no"/>
                         <accelerator key="q" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
@@ -125,69 +105,62 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="play">
-                        <property name="label">gtk-media-play</property>
+                      <object class="GtkMenuItem" id="play">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="events">GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK</property>
+                        <property name="label" translatable="yes">Play</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                         <signal name="activate" handler="play" object="button_play" swapped="no"/>
                         <accelerator key="space" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="slower">
-                        <property name="label" translatable="yes">Slower</property>
+                      <object class="GtkMenuItem" id="slower">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Slower</property>
                         <property name="use_underline">True</property>
-                        <property name="image">image4</property>
-                        <property name="use_stock">False</property>
                         <signal name="activate" handler="dec_speed" swapped="no"/>
                         <accelerator key="d" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="faster">
-                        <property name="label" translatable="yes">Faster</property>
+                      <object class="GtkMenuItem" id="faster">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Faster</property>
                         <property name="use_underline">True</property>
-                        <property name="image">image5</property>
-                        <property name="use_stock">False</property>
                         <signal name="activate" handler="inc_speed" swapped="no"/>
                         <accelerator key="f" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="forward">
-                        <property name="label">gtk-media-forward</property>
+                      <object class="GtkMenuItem" id="forward">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Forward</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                         <signal name="activate" handler="forward" swapped="no"/>
                         <accelerator key="Right" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="rewind">
-                        <property name="label">gtk-media-rewind</property>
+                      <object class="GtkMenuItem" id="rewind">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Rewind</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                         <signal name="activate" handler="rewind" swapped="no"/>
                         <accelerator key="Left" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="jump">
-                        <property name="label">gtk-jump-to</property>
+                      <object class="GtkMenuItem" id="jump">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Jump To</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                         <signal name="activate" handler="jump" swapped="no"/>
                         <accelerator key="j" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
@@ -207,12 +180,11 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="about">
-                        <property name="label">gtk-about</property>
+                      <object class="GtkMenuItem" id="about">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">About</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                         <signal name="activate" handler="about" swapped="no"/>
                       </object>
                     </child>
@@ -239,6 +211,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label">00:00.0</property>
+                <property name="width_chars">6</property>
+                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -309,6 +283,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label">00:00.0</property>
+                <property name="width_chars">6</property>
+                <property name="xalign">1</property>
               </object>
               <packing>
                 <property name="expand">False</property>

@@ -1,4 +1,4 @@
-# gTranscribe is a software focussed on easy transcription of spoken words.
+# gTranscribe is a software focused on easy transcription of spoken words.
 # Copyright (C) 2013-2014 Philip Rinn <rinni@inventati.org>
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
 #
@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+#pylint: disable=wrong-import-position
 import logging
 import gi
 gi.require_version('Gst', '1.0')
@@ -157,6 +158,7 @@ class gTranscribePlayer(Gst.Bin):
 
     volume = property(_get_volume, _set_volume)
 
+    # pylint: disable=unused-argument
     def on_new_decoded_pad(self, element, pad):
         """
         Handle new decoded pad from decodebin.
@@ -170,6 +172,7 @@ class gTranscribePlayer(Gst.Bin):
                 pad.link(self.apad)
             self.emit('ready', self.filename)
 
+    # pylint: disable=unused-argument
     def on_message(self, bus, message):
         """Handle message and react accordingly."""
         if message.type == Gst.MessageType.EOS:

@@ -1,97 +1,124 @@
-#
-# Philip Rinn <rinni@inventati.org>, 2016.
-#
-msgid ""
-msgstr ""
 "Project-Id-Version: gTranscribe 0.8\n"
 "Report-Msgid-Bugs-To: rinni@inventati.org\n"
-"POT-Creation-Date: 2016-12-28 15:24+0100\n"
-"PO-Revision-Date: 2016-12-28 17:59+0100\n"
+"PO-Revision-Date: 2020-06-03 23:29+0200\n"
 "Last-Translator: Philip Rinn <rinni@inventati.org>\n"
 "Language-Team: \n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 2.3.1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: gtranscribe.desktop.in:3
-msgid "gTranscribe audio player"
-msgstr "gTranscribe Audio-Player"
-
-#: bin/gtranscribe:187
+#: ../bin/gtranscribe:190
 msgid ""
 "gTranscribe is a software focussed on easy transcription of spoken words."
 msgstr ""
 "gTranscribe ist ein Programm, das auf einfaches Transkribieren von "
 "gesprochenen Wörtern fokussiert ist."
 
-#: bin/gtranscribe:195
+#: ../bin/gtranscribe:199
 msgid "Open Audio File"
 msgstr "Audio-Datei öffnen"
 
-#: bin/gtranscribe:196
+#: ../bin/gtranscribe:200
 msgid "All Audio Files"
 msgstr "Alle Audio-Dateien"
 
-#: bin/gtranscribe:418
+#: ../bin/gtranscribe:275 ../bin/gtranscribe:288
+#: ../data/ui/gTranscribe.glade:112
+msgid "Play"
+msgstr "Wiedergabe"
+
+#: ../bin/gtranscribe:278
+msgid "Pause"
+msgstr "Pausieren"
+
+#: ../bin/gtranscribe:429
 msgid "Open Text File"
 msgstr "Text-Datei öffnen"
 
-#: bin/gtranscribe.py:419
+#: ../bin/gtranscribe:430
 msgid "Plain Text Files"
 msgstr "Einfache Textdateien"
 
-#: bin/gtranscribe:492
+#: ../bin/gtranscribe:505
 msgid "Show debug messages"
 msgstr "Diagnosemeldungen anzeigen"
 
-#: bin/gtranscribe:493
+#: ../bin/gtranscribe:506
 msgid "Audio file to load"
 msgstr "Zu ladende Audio-Datei"
 
-#: data/ui/gTranscribe.glade:57
+#: ../data/ui/gTranscribe.glade:42
 msgid "_File"
 msgstr "_Datei"
 
-#: data/ui/gTranscribe.glade:76
+#: ../data/ui/gTranscribe.glade:52
+msgid "Open"
+msgstr "Öffnen"
+
+#: ../data/ui/gTranscribe.glade:62
 msgid "Open Text"
 msgstr "Öffne Text"
 
-#: data/ui/gTranscribe.glade:121
+#: ../data/ui/gTranscribe.glade:71
+msgid "Save"
+msgstr "Speichern"
+
+#: ../data/ui/gTranscribe.glade:87
+msgid "Quit"
+msgstr ""
+
+#: ../data/ui/gTranscribe.glade:101
 msgid "_Playback"
 msgstr "_Wiedergabe"
 
-#: data/ui/gTranscribe.glade:141
+#: ../data/ui/gTranscribe.glade:122
 msgid "Slower"
 msgstr "Langsamer"
 
-#: data/ui/gTranscribe.glade:153
+#: ../data/ui/gTranscribe.glade:132
 msgid "Faster"
 msgstr "Schneller"
 
-#: data/ui/gTranscribe.glade:204
+#: ../data/ui/gTranscribe.glade:142
+msgid "Forward"
+msgstr ""
+
+#: ../data/ui/gTranscribe.glade:152
+msgid "Rewind"
+msgstr ""
+
+#: ../data/ui/gTranscribe.glade:162
+msgid "Jump To"
+msgstr ""
+
+#: ../data/ui/gTranscribe.glade:176
 msgid "_Help"
 msgstr "_Hilfe"
 
-#: data/ui/gTranscribe.glade:377
+#: ../data/ui/gTranscribe.glade:186
+msgid "About"
+msgstr ""
+
+#: ../data/ui/gTranscribe.glade:351
 msgid "Change playback speed"
 msgstr "Wiedergabegeschwindigkeit ändern"
 
-#: data/ui/gTranscribe.glade:411
+#: ../data/ui/gTranscribe.glade:385
 msgid "Resume interval:"
 msgstr "Rücksprung-Intervall:"
 
-#: data/ui/gTranscribe.glade:426
+#: ../data/ui/gTranscribe.glade:400
 msgid "Change the time to jump back on resume in ms"
 msgstr "Zeit die nach dem Fortsetzen zurück gesprungen wird in ms"
 
-#: data/ui/gTranscribe.glade:440
+#: ../data/ui/gTranscribe.glade:414
 msgid "ms"
 msgstr "ms"
 
-#: gtranscribe/helpers.py:100
+#: ../gtranscribe/helpers.py:101
 msgid "Save Text File"
 msgstr "Text-Datei speichern"

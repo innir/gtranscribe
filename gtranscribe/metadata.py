@@ -1,5 +1,5 @@
-# gTranscribe is a software focussed on easy transcription of spoken words.
-# Copyright (C) 2013-2016 Philip Rinn <rinni@inventati.org>
+# gTranscribe is a software focused on easy transcription of spoken words.
+# Copyright (C) 2013-2020 Philip Rinn <rinni@inventati.org>
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ cache_dir = os.path.join(GLib.get_user_cache_dir(), "gTranscribe")
 database = os.path.join(cache_dir, "metadata.db")
 
 
-class MetaData(object):
+class MetaData():
     """
     Query and store information about a given file.
 
@@ -38,9 +38,7 @@ class MetaData(object):
         self._cache = {}
 
     def _get_data(self, attribute):
-        """
-        A generic method to hide the verbose process of getting attributes.
-        """
+        """Hide the verbose process of getting attributes."""
         # Use cached values if available to limit requests
         if attribute in self._cache:
             return self._cache[attribute]
@@ -56,9 +54,7 @@ class MetaData(object):
         return value
 
     def _set_data(self, attribute, value):
-        """
-        A generic method to hide the verbose process of setting attributes.
-        """
+        """Hide the verbose process of setting attributes."""
         logger.debug('Set attribute "%s": %s', attribute, value)
         query = 'UPDATE metadata SET ' + attribute + '=? WHERE md5=?'
         con = sqlite3.connect(database)
@@ -102,17 +98,16 @@ class MetaData(object):
         cur.close()
         con.close()
 
+    def init_db(self):
+        """Create the database for meta data if necessary."""
+        # make sure our cache directory exists
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir)
 
-def init_db():
-    """Create the database for meta data if necessary."""
-    # make sure our cache directory exists
-    if not os.path.exists(cache_dir):
-        os.makedirs(cache_dir)
-
-    con = sqlite3.connect(database)
-    cur = con.cursor()
-    cur.execute('CREATE TABLE IF NOT EXISTS metadata(md5 TEXT PRIMARY KEY,\
-                position INTEGER, speed REAL)')
-    con.commit()
-    cur.close()
-    con.close()
+        con = sqlite3.connect(database)
+        cur = con.cursor()
+        cur.execute('CREATE TABLE IF NOT EXISTS metadata(md5 TEXT PRIMARY KEY,\
+                    position INTEGER, speed REAL)')
+        con.commit()
+        cur.close()
+        con.close()
