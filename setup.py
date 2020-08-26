@@ -19,7 +19,7 @@ import DistUtilsExtra.auto
 
 DistUtilsExtra.auto.setup(
     name='gTranscribe',
-    version='0.8',
+    version='0.9',
     license='GPL-3',
     author='Philip Rinn',
     author_email='rinni@inventati.org',

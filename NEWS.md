@@ -1,3 +1,24 @@
+gTranscribe 0.9 Release Notes
+=============================
+
+Bug fixes
+---------
+
+  * Fix media keys.
+    [[99b1958](https://github.com/innir/gtranscribe/commit/99b19580471619709081e318882fdc030e60b5fa)]
+
+  * Fixes for deprecation warnings & refactoring.
+    [[0e26be2](https://github.com/innir/gtranscribe/commit/0e26be2dc9053a9cbdea7c97e60b32de1ceca454)]
+    [[7a9c06d](https://github.com/innir/gtranscribe/commit/7a9c06d05dae2765fe42a548fda4d48733b97328)]
+
+  * Make close button work in about dialog.
+    [[c29dd68](https://github.com/innir/gtranscribe/commit/c29dd68ed5fbecdeab2bb32bf29bad6fdf0521cf)]
+
+  * Activate speed scale only after a file was loaded.
+    [[447e447](https://github.com/innir/gtranscribe/commit/447e44710a7bb5654d9b4186e93ac6a2bce2f1d5)]
+
+
+
 gTranscribe 0.8 Release Notes
 =============================
 

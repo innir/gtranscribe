@@ -1,4 +1,4 @@
-"Project-Id-Version: gTranscribe 0.8\n"
+"Project-Id-Version: gTranscribe 0.9\n"
 "Report-Msgid-Bugs-To: rinni@inventati.org\n"
 "PO-Revision-Date: 2020-06-03 23:29+0200\n"
 "Last-Translator: Philip Rinn <rinni@inventati.org>\n"
