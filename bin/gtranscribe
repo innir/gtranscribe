@@ -82,7 +82,7 @@ class gTranscribeWindow:
         try:
             session_bus = dbus.SessionBus()
             settings_daemon_proxy = session_bus.get_object(
-                'org.gnome.SettingsDaemon',
+                'org.gnome.SettingsDaemon.MediaKeys',
                 '/org/gnome/SettingsDaemon/MediaKeys')
             self.settings_daemon = dbus.Interface(
                 settings_daemon_proxy, 'org.gnome.SettingsDaemon.MediaKeys')
@@ -267,13 +267,16 @@ class gTranscribeWindow:
         logger.debug('Received media key %s for %s', key, application)
         if application == 'gTranscribe':
             if key == 'Play':
-                self.play_action.activate()
+                if self.slider.is_sensitive():
+                    self.play_action.activate()
             elif key in ('Stop', 'Pause'):
                 self.play_action.set_active(False)
             elif key == 'Next':
-                self.forward(None)
+                if self.forward_button.is_sensitive():
+                    self.forward(None)
             elif key == 'Previous':
-                self.rewind(None)
+                if self.rewind_button.is_sensitive():
+                    self.rewind(None)
 
     # pylint: disable=unused-argument
     def on_focus(self, widget, event):
@@ -511,7 +514,8 @@ class gTranscribeWindow:
             self.text_buffer.insert_at_cursor(pos_str)
         # handling for yellow foot switch "science" from cleware
         if keyname == 'F9':
-            self.play_action.activate()
+            if self.slider.is_sensitive():
+                self.play_action.activate()
         elif keyname == 'F4':
             self.play_action.set_active(False)
 
