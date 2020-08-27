@@ -30,7 +30,8 @@ class gTranscribePlayer(Gst.Bin):
 
     __gsignals__ = {
         'ready': (GObject.SignalFlags.RUN_LAST, None, (GObject.TYPE_STRING,)),
-        'ended': (GObject.SignalFlags.RUN_LAST, None, ())
+        'ended': (GObject.SignalFlags.RUN_LAST, None, ()),
+        'duration_changed': (GObject.SignalFlags.RUN_LAST, None, ())
     }
 
     def __init__(self):
@@ -38,6 +39,7 @@ class gTranscribePlayer(Gst.Bin):
 
         self._rate = 1
         self._duration = None
+        self._messageType = Gst.MessageType.UNKNOWN
         self.init_pipeline()
 
     def init_pipeline(self):
@@ -89,10 +91,13 @@ class gTranscribePlayer(Gst.Bin):
     def duration(self):
         """Return the duration of the current stream."""
         success = False
-        if self._duration is None:
+        if self._duration is None or self._messageType == Gst.MessageType.DURATION_CHANGED:
             success, self._duration = self.pipeline.query_duration(Gst.Format.TIME)
-            logger.debug('Query was successful: %s, Duration is: "%s"', success, self._duration)
-        return self._duration if success else 0
+            if not success:
+                self._duration = 0
+            logger.debug('Query was successful: %s, Duration is: "%s"',
+                         success, self._duration)
+        return self._duration
 
     def _get_position(self):
         """Return the position of the current stream."""
@@ -175,12 +180,15 @@ class gTranscribePlayer(Gst.Bin):
     # pylint: disable=unused-argument
     def on_message(self, bus, message):
         """Handle message and react accordingly."""
+        self._messageType = message.type
         if message.type == Gst.MessageType.EOS:
             self.state = Gst.State.NULL
             self.emit('ended')
         elif message.type == Gst.MessageType.ERROR:
             logger.debug("%s", print(message.parse_error()))
             self.state = Gst.State.NULL
+        elif message.type == Gst.MessageType.DURATION_CHANGED:
+            self.emit('duration_changed')
 
     def open(self, filepath, duration=True):
         """Open audio file and optionally query duration."""

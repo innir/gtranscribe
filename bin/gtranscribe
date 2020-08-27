@@ -98,6 +98,7 @@ class gTranscribeWindow:
         self.player = gTranscribePlayer()
         self.player.connect('ready', self.on_file_ready)
         self.player.connect('ended', self.on_file_ended)
+        self.player.connect('duration_changed', self.on_duration_changed)
 
         if audiofile:
             # Open a file passed as command-line parameter.
@@ -220,6 +221,21 @@ class gTranscribeWindow:
         logger.debug('received signal "ready"')
         GLib.idle_add(self.update_file, audiofile)
 
+    # pylint: disable=unused-argument
+    def on_duration_changed(self, sig):
+        if sig is not None:
+            logger.debug('received signal "duration_changed"')
+        duration = ns_to_time(self.player.duration)
+        if duration.hour:
+            self.time_str = '%H:%M:%S.%f'
+        else:
+            self.time_str = '%M:%S.%f'
+        # set duration
+        dur_str = trim(duration.strftime(self.time_str))
+        self.dur_label.set_text(dur_str)
+        # set position
+        self.set_position_label(time_to_ns(duration))
+
     def update_file(self, audiofile):
         self.position = 0
         fileinfo = MetaData(audiofile, self.md5)
@@ -231,16 +247,8 @@ class gTranscribeWindow:
         if fileinfo.speed:
             logger.debug('Resuming with speed %s', fileinfo.speed)
             self.speedscale.set_value(fileinfo.speed)
-        duration = ns_to_time(self.player.duration)
-        if duration.hour:
-            self.time_str = '%H:%M:%S.%f'
-        else:
-            self.time_str = '%M:%S.%f'
-        # set duration
-        dur_str = trim(duration.strftime(self.time_str))
-        self.dur_label.set_text(dur_str)
-        # set position
-        self.set_position_label(time_to_ns(duration))
+        # Query duration once before we start playing
+        self.on_duration_changed(None)
         # set window title
         filename = os.path.basename(audiofile)
         self.window.set_title(u'gTranscribe \u2013 %s' % filename)
@@ -331,6 +339,8 @@ class gTranscribeWindow:
                 self.slider.set_value(scalepos)
             pos_str = trim(ns_to_time(self.position).strftime(self.time_str))
             self.pos_label.set_text(pos_str)
+        else:
+            logger.warning("Can't update position, don't know the duration")
 
     def dec_speed(self, action):
         self.speedscale.set_value(self.speedscale.get_value() - 0.1)
