@@ -88,10 +88,11 @@ class gTranscribePlayer(Gst.Bin):
     @property
     def duration(self):
         """Return the duration of the current stream."""
+        success = False
         if self._duration is None:
-            self._duration = self.pipeline.query_duration(Gst.Format.TIME)[1]
-            logger.debug('Duration is: "%s"', self._duration)
-        return self._duration
+            success, self._duration = self.pipeline.query_duration(Gst.Format.TIME)
+            logger.debug('Query was successful: %s, Duration is: "%s"', success, self._duration)
+        return self._duration if success else 0
 
     def _get_position(self):
         """Return the position of the current stream."""
