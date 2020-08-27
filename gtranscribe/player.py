@@ -128,7 +128,6 @@ class gTranscribePlayer(Gst.Bin):
         # Position query was not successful
         if pos[0] == 0:
             seek_type = Gst.SeekType.NONE
-            pos[1] = -1
         self.pipeline.seek(rate,
                            Gst.Format.TIME,
                            Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE,

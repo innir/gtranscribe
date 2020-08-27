@@ -382,7 +382,7 @@ class gTranscribeWindow:
 
     def on_scale_speed_value_changed(self, speed):
         value = speed.get_value()
-        if (value != self.player.rate) and hasattr(self, 'md5'):
+        if (value != self.player.rate) and (self.md5 is not None):
             self.player.rate = value
             fileinfo = MetaData(self.player.filename, self.md5)
             fileinfo.speed = value
@@ -456,7 +456,7 @@ class gTranscribeWindow:
             text = fin.read()
             fin.close()
             # Only do this if an audio file is already loaded
-            if hasattr(self, 'md5'):
+            if self.md5 is not None:
                 # Try to get the last position
                 pos = text[-15:]
                 logger.debug('Try to get the last position from %s', pos)
