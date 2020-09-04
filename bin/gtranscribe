@@ -31,14 +31,8 @@ from dbus.mainloop.glib import DBusGMainLoop
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gtk, Gdk, GdkPixbuf
-try:
-    gi.require_version('Gspell', '1')
-    from gi.repository import Gspell
-    SPELL_FALLBACK = False
-except ValueError:
-    gi.require_version('GtkSpell', '3.0')
-    from gi.repository import GtkSpell
-    SPELL_FALLBACK = True
+gi.require_version('Gspell', '1')
+from gi.repository import Gspell
 
 # Add project root directory to sys.path.
 PROJECT_ROOT_DIRECTORY = os.path.dirname(os.path.dirname(
@@ -123,13 +117,8 @@ class gTranscribeWindow:
         self.window.set_default_icon(icon)
 
         self.text_view = builder.get_object("text_view")
-        if SPELL_FALLBACK:
-            schecker = GtkSpell.Checker()
-            schecker.set_language(locale.getdefaultlocale()[0])
-            schecker.attach(self.text_view)
-        else:
-            schecker = Gspell.TextView.get_from_gtk_text_view(self.text_view)
-            Gspell.TextView.basic_setup(schecker)
+        schecker = Gspell.TextView.get_from_gtk_text_view(self.text_view)
+        Gspell.TextView.basic_setup(schecker)
         self.text_buffer = self.text_view.get_buffer()
 
         spinbutton_jump = builder.get_object("spinbutton_jump")
