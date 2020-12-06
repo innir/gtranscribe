@@ -282,8 +282,16 @@ class gTranscribeWindow:
         if self.settings_daemon:
             self.settings_daemon.GrabMediaPlayerKeys('gTranscribe', 0)
 
+    # pylint: disable=unused-argument
+    def toggle_play_action(self, action):
+        """Toggle play button when activated via shortcut"""
+        if self.play_action.get_active():
+            self.play_action.set_active(False)
+        else:
+            self.play_action.set_active(True)
+
     def play(self, action):
-        if action.get_active() or self.play_menu.get_label() == _("Play"):
+        if action.get_active():
             logger.debug('play action triggered')
             self.icon_play.set_from_icon_name(Gtk.STOCK_MEDIA_PAUSE, 2)
             self.play_menu.set_label(_("Pause"))

@@ -111,7 +111,7 @@
                         <property name="events">GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK</property>
                         <property name="label" translatable="yes">Play</property>
                         <property name="use_underline">True</property>
-                        <signal name="activate" handler="play" object="button_play" swapped="no"/>
+                        <signal name="activate" handler="toggle_play_action" swapped="no"/>
                         <accelerator key="space" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
