@@ -1,3 +1,28 @@
+gTranscribe 0.10 Release Notes
+=============================
+
+Dependency changes
+---------
+
+  * Remove fallback to GtkSpell - Gspell is available everywhere now.
+    [[8d068a5](https://github.com/innir/gtranscribe/commit/8d068a5a7973e7f74afb9af010c750e37f1391b0)]
+
+
+Bug fixes
+---------
+
+  * Correctly toggle play button when used via keyboard shortcuts.
+    [[57b02fc](https://github.com/innir/gtranscribe/commit/57b02fc788961ecc7a21f460c71d351b51217abe)]
+
+  * Better cope with GStreamer not able to get the duration of a file.
+    [[14f64d1](https://github.com/innir/gtranscribe/commit/14f64d1b5fe1ea69cf6c472040ca6828a770ad84)]
+    [[d8be2b6](https://github.com/innir/gtranscribe/commit/d8be2b68f8f04c93e9b847081afe98935a79ec35)]
+
+  * Fix traceback on slower/faster before file is opened.
+    [[1fe77d0](https://github.com/innir/gtranscribe/commit/1fe77d0290441c55af79236a83b1e8e2dca6f0ef)]
+
+
+
 gTranscribe 0.9 Release Notes
 =============================
 
