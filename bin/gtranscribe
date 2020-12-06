@@ -22,6 +22,7 @@ import re
 import logging
 import argparse
 import locale
+import datetime
 import gettext
 from gettext import gettext as _
 import signal
@@ -41,7 +42,9 @@ PROJECT_ROOT_DIRECTORY = os.path.dirname(os.path.dirname(
 if PROJECT_ROOT_DIRECTORY not in sys.path:
     sys.path.insert(0, PROJECT_ROOT_DIRECTORY)
 
-from gtranscribe.helpers import *
+from gtranscribe.helpers import trim, ns_to_time, time_to_ns, \
+    get_open_filename, get_save_filename, error_message, md5_of_file, \
+    get_data_file
 from gtranscribe.player import gTranscribePlayer
 from gtranscribe.metadata import MetaData
 
