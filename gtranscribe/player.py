@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
 import logging
 import gi
 gi.require_version('Gst', '1.0')

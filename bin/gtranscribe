@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
 import sys
 import os
 import re
@@ -213,7 +213,6 @@ class gTranscribeWindow:
         logger.debug('received signal "ready"')
         GLib.idle_add(self.update_file, audiofile)
 
-    # pylint: disable=unused-argument
     def on_duration_changed(self, sig):
         if sig is not None:
             logger.debug('received signal "duration_changed"')
@@ -364,11 +363,11 @@ class gTranscribeWindow:
                 self.text_buffer.get_iter_at_offset(line_start - 10),
                 self.text_buffer.get_iter_at_offset(line_start - 1), True)
             logger.debug('Try to get the position from %s', pos)
-            #pylint: disable=anomalous-backslash-in-string
+            # pylint: disable=anomalous-backslash-in-string
             pos_tag = re.compile('\[\d\d:\d\d.\d\]')
             if pos_tag.match(pos):
                 pos = pos[-8:-1]
-                #pylint: disable=anomalous-backslash-in-string
+                # pylint: disable=anomalous-backslash-in-string
                 pos_tag = re.compile('\d\d:\d\d.\d')
                 if pos_tag.match(pos):
                     self.player.position = time_to_ns(
@@ -462,7 +461,7 @@ class gTranscribeWindow:
                 # Try to get the last position
                 pos = text[-15:]
                 logger.debug('Try to get the last position from %s', pos)
-                #pylint: disable=anomalous-backslash-in-string
+                # pylint: disable=anomalous-backslash-in-string
                 pos_tag = re.compile('.*[\[#]((\d\d:)?\d\d:\d\d[-.]\d)[\]#]')
                 if pos_tag.match(pos):
                     pos = pos_tag.match(pos).group(1).replace("-", ".")
@@ -511,8 +510,8 @@ class gTranscribeWindow:
     def on_text_insert(self, widget, event):
         keyname = Gdk.keyval_name(event.keyval)
         if (keyname in ('Return', 'F8')) and self.position > 0:
-            pos_str = ' #' + trim(
-                ns_to_time(self.position).strftime(self.time_str.replace(".", "-"))) + '#'
+            pos_str = ' #' + trim(ns_to_time(
+                self.position).strftime(self.time_str.replace(".", "-"))) + '#'
             self.text_buffer.insert_at_cursor(pos_str)
         # handling for yellow foot switch "science" from cleware
         if keyname == 'F9':
