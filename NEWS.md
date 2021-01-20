@@ -1,3 +1,14 @@
+gTranscribe 0.10.1 Release Notes
+=============================
+
+Bug fixes
+---------
+
+  * Make it possible to open file that are longer than 24h.
+    [[2e0a4d0](https://github.com/innir/gtranscribe/commit/2e0a4d073ce3721b25badc5199a347091ea45669)]
+
+
+
 gTranscribe 0.10 Release Notes
 =============================
 
