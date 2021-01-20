@@ -1,5 +1,5 @@
 # gTranscribe is a software focused on easy transcription of spoken words.
-# Copyright (C) 2013-2020 Philip Rinn <rinni@inventati.org>
+# Copyright (C) 2013-2021 Philip Rinn <rinni@inventati.org>
 # Copyright (C) 2010 Frederik Elwert <frederik.elwert@web.de>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,59 @@ from gi.repository import Gtk
 gettext.textdomain('gTranscribe')
 
 
+class duration:
+    """
+    Stores a time duration in hours, minutes, seconds and microseconds.
+
+    Implements only a fraction of datetime.time but allows hour >= 24.
+    """
+
+    __slots__ = '_hour', '_minute', '_second', '_microsecond'
+
+    def __new__(cls, hour=0, minute=0, second=0, microsecond=0):
+        """Constructor.
+        Arguments:
+        hour, minute, second, microsecond (default to zero)
+        """
+        self = object.__new__(cls)
+        self._hour = hour
+        self._minute = minute
+        self._second = second
+        self._microsecond = microsecond
+        return self
+
+    @property
+    def hour(self):
+        """hour"""
+        return self._hour
+
+    @property
+    def minute(self):
+        """minute (0-59)"""
+        return self._minute
+
+    @property
+    def second(self):
+        """second (0-59)"""
+        return self._second
+
+    @property
+    def microsecond(self):
+        """microsecond (0-999999)"""
+        return self._microsecond
+
+    def strftime(self, format):
+        """
+        Probably not what you think it is :-(.
+        It just implements what's needed for gTranscribe.
+        """
+        txt = format.replace("%H", str(self._hour))
+        txt = txt.replace("%M", str(self._minute))
+        txt = txt.replace("%S", str(self._second))
+        txt = txt.replace("%f", str(self._microsecond))
+        return txt
+
+
 def trim(timestring, digits=1):
     """Trim a time string to contain only a given number of digits."""
     pos = re.search("[.-]", timestring).start()
@@ -37,7 +90,7 @@ def trim(timestring, digits=1):
 
 def ns_to_time(ns):
     """
-    Convert nanoseconds to a datetime.time object.
+    Convert nanoseconds to a duration object.
 
     :Parameters:
         - 'ns': Nanoseconds as int.
@@ -52,15 +105,15 @@ def ns_to_time(ns):
     s = mod // 1000000000
     mod = mod % 1000000000
     ms = mod // 1000
-    return datetime.time(h, m, s, ms)
+    return duration(h, m, s, ms)
 
 
 def time_to_ns(time):
     """
-    Convert a datetime.time object to nanoseconds.
+    Convert a datetime.time or duration object to nanoseconds.
 
     :Parameters:
-        - 'time': A datetime.time object.
+        - 'time': A datetime.time or duration object.
 
     :Return:
         - Nanoseconds as int.
