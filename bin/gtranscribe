@@ -242,7 +242,7 @@ class gTranscribeWindow:
         self.on_duration_changed(None)
         # set window title
         filename = os.path.basename(audiofile)
-        self.window.set_title(u'gTranscribe \u2013 %s' % filename)
+        self.window.set_title(f"gTranscribe \u2013 {filename}")
         self.play_action.set_sensitive(True)
         self.slider.set_sensitive(True)
         self.rewind_button.set_sensitive(True)
@@ -387,7 +387,7 @@ class gTranscribeWindow:
 
     # pylint: disable=unused-argument,no-self-use
     def on_scale_speed_format_value(self, widget, value, data=None):
-        return u'%s\xd7' % locale.format_string('%.1f', value)
+        return f"{locale.format_string('%.1f', value)}\xd7"
 
     def on_scale_speed_value_changed(self, speed):
         value = speed.get_value()
@@ -461,9 +461,8 @@ class gTranscribeWindow:
                                           _('Plain Text Files'), 'text/plain')
         if self.filename is not None:
             # get the file contents
-            fin = open(self.filename, "r")
-            text = fin.read()
-            fin.close()
+            with open(file=self.filename, mode="r", encoding="utf_8") as fin:
+                text = fin.read()
             # Only do this if an audio file is already loaded
             if self.md5 is not None:
                 # Try to get the last position
@@ -506,13 +505,12 @@ class gTranscribeWindow:
                                              True)
             self.text_view.set_sensitive(True)
             self.text_buffer.set_modified(False)
-            fout = open(self.filename, "w")
-            fout.write(text)
-            fout.close()
+            with open(file=self.filename, mode="w", encoding="utf_8") as fout:
+                fout.write(text)
             self.text_view.grab_focus()
         except:
             # error writing file, show message to user
-            error_message(self, "Could not save file: %s" % self.filename)
+            error_message(self, f"Could not save file: {self.filename}")
 
     # pylint: disable=unused-argument
     def on_text_insert(self, widget, event):

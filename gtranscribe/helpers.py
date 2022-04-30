@@ -16,7 +16,6 @@
 
 # pylint: disable=wrong-import-position
 import os.path
-import datetime
 from hashlib import md5
 import re
 import gettext
@@ -68,12 +67,12 @@ class duration:
         """microsecond (0-999999)"""
         return self._microsecond
 
-    def strftime(self, format):
+    def strftime(self, fmt_string):
         """
         Probably not what you think it is :-(.
         It just implements what's needed for gTranscribe.
         """
-        txt = format.replace("%H", str(self._hour))
+        txt = fmt_string.replace("%H", str(self._hour))
         txt = txt.replace("%M", str(self._minute))
         txt = txt.replace("%S", str(self._second))
         txt = txt.replace("%f", str(self._microsecond))

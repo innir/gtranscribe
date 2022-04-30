@@ -35,7 +35,7 @@ class gTranscribePlayer(Gst.Bin):
     }
 
     def __init__(self):
-        super(gTranscribePlayer, self).__init__()
+        super().__init__()
 
         self._rate = 1
         self._duration = None

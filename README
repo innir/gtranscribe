@@ -7,7 +7,7 @@ Homepage: https://github.com/innir/gtranscribe
 
 
 :: Dependencies ::
- - python (>= 3.0)
+ - python (>= 3.6)
  - python3-distutils-extra (>= 2.22)
  - python3-gi
  - python3-dbus
