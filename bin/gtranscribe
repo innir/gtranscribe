@@ -31,7 +31,9 @@ import dbus
 from dbus.mainloop.glib import DBusGMainLoop
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gtk, Gdk, GdkPixbuf
+from gi.repository import GLib, Gtk, Gdk, GdkPixbuf, GObject
+gi.require_version('GtkSource', '3.0')
+from gi.repository import GtkSource
 gi.require_version('Gspell', '1')
 from gi.repository import Gspell
 
@@ -52,7 +54,7 @@ locale.setlocale(locale.LC_ALL, '')
 gettext.textdomain('gTranscribe')
 DBusGMainLoop(set_as_default=True)
 
-
+# pylint: disable=invalid-name
 class gTranscribeWindow:
 
     def __init__(self, audiofile):
@@ -103,6 +105,7 @@ class gTranscribeWindow:
             GLib.idle_add(self.open_file, audiofile)
 
     def _init_ui(self):
+        GObject.type_register(GtkSource.View)
         builder = Gtk.Builder()
         builder.set_translation_domain('gTranscribe')
         builder.add_from_file(get_data_file(PROJECT_ROOT_DIRECTORY, 'ui',
@@ -385,7 +388,7 @@ class gTranscribeWindow:
                         self.text_buffer.get_iter_at_offset(line_start))
                     logger.debug('Set position')
 
-    # pylint: disable=unused-argument,no-self-use
+    # pylint: disable=unused-argument
     def on_scale_speed_format_value(self, widget, value, data=None):
         return f"{locale.format_string('%.1f', value)}\xd7"
 

@@ -25,7 +25,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 gettext.textdomain('gTranscribe')
 
-
+# pylint: disable=invalid-name
 class duration:
     """
     Stores a time duration in hours, minutes, seconds and microseconds.
@@ -85,7 +85,6 @@ def trim(timestring, digits=1):
     if pos > -1:
         return timestring[:pos + 1 + digits]
     return timestring
-
 
 def ns_to_time(ns):
     """

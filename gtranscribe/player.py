@@ -22,7 +22,7 @@ from gi.repository import Gst, GObject
 logger = logging.getLogger('player')
 Gst.init(None)
 
-
+# pylint: disable=invalid-name
 class gTranscribePlayer(Gst.Bin):
     """Class to play audio files with Gstreamer."""
 
@@ -39,7 +39,7 @@ class gTranscribePlayer(Gst.Bin):
 
         self._rate = 1
         self._duration = None
-        self._messageType = Gst.MessageType.UNKNOWN
+        self._message_type = Gst.MessageType.UNKNOWN
         self.init_pipeline()
 
     def init_pipeline(self):
@@ -91,7 +91,7 @@ class gTranscribePlayer(Gst.Bin):
     def duration(self):
         """Return the duration of the current stream."""
         success = False
-        if self._duration is None or self._messageType == Gst.MessageType.DURATION_CHANGED:
+        if self._duration is None or self._message_type == Gst.MessageType.DURATION_CHANGED:
             success, self._duration = self.pipeline.query_duration(Gst.Format.TIME)
             if not success:
                 self._duration = 0
@@ -180,7 +180,7 @@ class gTranscribePlayer(Gst.Bin):
     # pylint: disable=unused-argument
     def on_message(self, bus, message):
         """Handle message and react accordingly."""
-        self._messageType = message.type
+        self._message_type = message.type
         if message.type == Gst.MessageType.EOS:
             self.state = Gst.State.NULL
             self.emit('ended')
