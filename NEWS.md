@@ -1,3 +1,14 @@
+gTranscribe 0.11 Release Notes
+=============================
+
+New features
+------------
+
+  * Add undo/redo functionality.
+    [[d4ba34b](https://github.com/innir/gtranscribe/commit/d4ba34b3bd3a21812bcb4e0f0697c70fc424680a)]
+
+
+
 gTranscribe 0.10.1 Release Notes
 =============================
 

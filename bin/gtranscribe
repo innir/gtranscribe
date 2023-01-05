@@ -185,8 +185,8 @@ class gTranscribeWindow:
         about_dialog.set_transient_for(self.window)
         about_dialog.set_modal(True)
         about_dialog.set_name("gTranscribe")
-        about_dialog.set_version("0.10.1")
-        about_dialog.set_copyright("Copyright \u00A9 2013-2021 Philip Rinn\n"
+        about_dialog.set_version("0.11")
+        about_dialog.set_copyright("Copyright \u00A9 2013-2023 Philip Rinn\n"
                                    "Copyright \u00A9 2010 Frederik Elwert")
         about_dialog.set_comments(_("gTranscribe is a software focused "
                                     "on easy transcription of spoken words."))
