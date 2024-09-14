@@ -32,7 +32,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gtk, Gdk, GdkPixbuf, GObject
-gi.require_version('GtkSource', '3.0')
+gi.require_version('GtkSource', '4')
 from gi.repository import GtkSource
 gi.require_version('Gspell', '1')
 from gi.repository import Gspell

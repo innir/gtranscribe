@@ -12,7 +12,7 @@ Homepage: https://github.com/innir/gtranscribe
  - python3-gi
  - python3-dbus
  - gir1.2-gtk-3.0
- - gir1.2-gtksource-3.0
+ - gir1.2-gtksource-4
  - gir1.2-glib-2.0
  - gir1.2-gspell-1
  - gir1.2-gstreamer-1.0
