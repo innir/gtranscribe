@@ -34,61 +34,55 @@ class gTranscribePlayer(Gst.Bin):
         'duration_changed': (GObject.SignalFlags.RUN_LAST, None, ())
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-        self._rate = 1
-        self._duration = None
-        self._message_type = Gst.MessageType.UNKNOWN
+        self._rate: float = 1
+        self._duration: int | None = None
+        self._message_type: Gst.MessageType = Gst.MessageType.UNKNOWN
         self.init_pipeline()
 
-    def init_pipeline(self):
+    def init_pipeline(self) -> None:
         """Initialize the audio pipeline."""
         self.pipeline = Gst.Pipeline()
         self.audiosrc = Gst.ElementFactory.make('filesrc', None)
         decoder = Gst.ElementFactory.make('decodebin', None)
-        convert1 = Gst.ElementFactory.make('audioconvert', None)
-        resample1 = Gst.ElementFactory.make('audioresample', None)
-        self.volume1 = Gst.ElementFactory.make('volume', None)
-        self.volume1.set_property('volume', 1)
+        convert = Gst.ElementFactory.make('audioconvert', None)
+        resample = Gst.ElementFactory.make('audioresample', None)
+        self.volume_element = Gst.ElementFactory.make('volume', None)
+        self.volume_element.set_property('volume', 1)
         scaletempo = Gst.ElementFactory.make('scaletempo', None)
-        convert2 = Gst.ElementFactory.make('audioconvert', None)
-        resample2 = Gst.ElementFactory.make('audioresample', None)
         sink = Gst.ElementFactory.make('autoaudiosink', None)
 
         decoder.connect('pad-added', self.on_new_decoded_pad)
 
         self.pipeline.add(self.audiosrc)
         self.pipeline.add(decoder)
-        self.pipeline.add(convert1)
-        self.pipeline.add(self.volume1)
-        self.pipeline.add(resample1)
+        self.pipeline.add(convert)
+        self.pipeline.add(resample)
+        self.pipeline.add(self.volume_element)
         self.pipeline.add(scaletempo)
-        self.pipeline.add(convert2)
-        self.pipeline.add(resample2)
         self.pipeline.add(sink)
 
         self.audiosrc.link(decoder)
-        convert1.link(resample1)
-        resample1.link(self.volume1)
-        self.volume1.link(scaletempo)
-        scaletempo.link(convert2)
-        convert2.link(resample2)
-        resample2.link(sink)
+        convert.link(resample)
+        resample.link(self.volume_element)
+        self.volume_element.link(scaletempo)
+        scaletempo.link(sink)
 
-        self.apad = convert1.get_static_pad('sink')
+        self.apad = convert.get_static_pad('sink')
 
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect('message', self.on_message)
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         """Return the filename of the current stream."""
-        return self.audiosrc.get_property('location')
+        return str(self.audiosrc.get_property('location'))
 
     @property
-    def duration(self):
+    def duration(self) -> int:
         """Return the duration of the current stream."""
         success = False
         if self._duration is None or self._message_type == Gst.MessageType.DURATION_CHANGED:
@@ -99,7 +93,7 @@ class gTranscribePlayer(Gst.Bin):
                          success, self._duration)
         return self._duration
 
-    def _get_position(self):
+    def _get_position(self) -> int:
         """Return the position of the current stream."""
         # Sometimes querying the position does not work on the first try
         pos = [0]
@@ -107,64 +101,68 @@ class gTranscribePlayer(Gst.Bin):
             pos = self.pipeline.query_position(Gst.Format.TIME)
         return pos[1]
 
-    def _set_position(self, position):
+    def _set_position(self, position: int) -> None:
         """Set the position of the current stream."""
-        self.pipeline.seek(self._rate,
-                           Gst.Format.TIME,
-                           Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE,
-                           Gst.SeekType.SET, position,
-                           Gst.SeekType.NONE, -1)
+        seek_event = Gst.Event.new_seek(
+            self._rate,
+            Gst.Format.TIME,
+            Gst.SeekFlags.FLUSH,
+            Gst.SeekType.SET, position,
+            Gst.SeekType.NONE, -1
+        )
+        self.pipeline.send_event(seek_event)
 
     position = property(_get_position, _set_position)
 
     @property
-    def playing(self):
+    def playing(self) -> bool:
         """Return if pipeline is currently playing."""
-        return Gst.State.PLAYING == self.state
+        return bool(Gst.State.PLAYING == self.state)
 
-    def _get_rate(self):
+    def _get_rate(self) -> float:
         """Get the playback speed of the current stream."""
         return self._rate
 
-    def _set_rate(self, rate):
+    def _set_rate(self, rate: float) -> None:
         """Set the playback speed of the current stream."""
         self._rate = rate
-        seek_type = Gst.SeekType.SET
         pos = self.pipeline.query_position(Gst.Format.TIME)
-        # Position query was not successful
-        if pos[0] == 0:
-            seek_type = Gst.SeekType.NONE
-        self.pipeline.seek(rate,
-                           Gst.Format.TIME,
-                           Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE,
-                           seek_type, pos[1],
-                           Gst.SeekType.NONE, -1)
+        # Position query was not successful, use current position or 0
+        position = pos[1] if pos[0] else 0
+        seek_event = Gst.Event.new_seek(
+            rate,
+            Gst.Format.TIME,
+            Gst.SeekFlags.FLUSH,
+            Gst.SeekType.SET, position,
+            Gst.SeekType.NONE, -1
+        )
+        self.pipeline.send_event(seek_event)
 
     rate = property(_get_rate, _set_rate)
 
-    def _get_state(self):
+    def _get_state(self) -> Gst.State:
         """Get the state of the audio pipeline."""
         return self.pipeline.get_state(0)[1]
 
-    def _set_state(self, state):
+    def _set_state(self, state: Gst.State) -> None:
         """Set the state of the audio pipeline."""
         if not state == self.state:
             self.pipeline.set_state(state)
 
     state = property(_get_state, _set_state)
 
-    def _get_volume(self):
+    def _get_volume(self) -> float:
         """Get the volume of the current stream."""
-        return self.volume1.get_property('volume')
+        return float(self.volume_element.get_property('volume'))
 
-    def _set_volume(self, volume):
+    def _set_volume(self, volume: float) -> None:
         """Set the volume of the current stream."""
-        self.volume1.set_property('volume', volume)
+        self.volume_element.set_property('volume', volume)
 
     volume = property(_get_volume, _set_volume)
 
     # pylint: disable=unused-argument
-    def on_new_decoded_pad(self, element, pad):
+    def on_new_decoded_pad(self, element: Gst.Element, pad: Gst.Pad) -> None:
         """
         Handle new decoded pad from decodebin.
 
@@ -178,7 +176,7 @@ class gTranscribePlayer(Gst.Bin):
             self.emit('ready', self.filename)
 
     # pylint: disable=unused-argument
-    def on_message(self, bus, message):
+    def on_message(self, bus: Gst.Bus, message: Gst.Message) -> None:
         """Handle message and react accordingly."""
         self._message_type = message.type
         if message.type == Gst.MessageType.EOS:
@@ -190,7 +188,7 @@ class gTranscribePlayer(Gst.Bin):
         elif message.type == Gst.MessageType.DURATION_CHANGED:
             self.emit('duration_changed')
 
-    def open(self, filepath, duration=True):
+    def open(self, filepath: str, duration: bool = True) -> None:
         """Open audio file and optionally query duration."""
         logger.debug('Opening file "%s"', filepath)
         self.state = Gst.State.READY
@@ -199,9 +197,11 @@ class gTranscribePlayer(Gst.Bin):
             self._duration = None
         # Force decoding of file so we have a duration
         self.state = Gst.State.PLAYING
+        self.pipeline.get_state(Gst.CLOCK_TIME_NONE)  # Wait for state change
         self.state = Gst.State.PAUSED
+        self.pipeline.get_state(Gst.CLOCK_TIME_NONE)  # Wait for state change
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset the pipeline."""
         logger.debug('Reset the pipeline')
         self.state = Gst.State.NULL
@@ -209,15 +209,15 @@ class gTranscribePlayer(Gst.Bin):
         self.init_pipeline()
         self.open(filename, False)
 
-    def play(self):
+    def play(self) -> None:
         """Start playback from current position."""
         self.state = Gst.State.PLAYING
 
-    def pause(self):
+    def pause(self) -> None:
         """Pause playback."""
         self.state = Gst.State.PAUSED
 
-    def move_position(self, amount):
+    def move_position(self, amount: int) -> None:
         """Move playback position."""
         new_position = self.position + amount
         # Clamp new_position between 0 and self.duration

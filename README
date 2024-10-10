@@ -7,14 +7,15 @@ Homepage: https://github.com/innir/gtranscribe
 
 
 :: Dependencies ::
- - python (>= 3.6)
+ - python (>= 3.10)
  - python3-distutils-extra (>= 2.22)
  - python3-gi
  - python3-dbus
- - gir1.2-gtk-3.0
- - gir1.2-gtksource-4
+ - gir1.2-gtk-4.0
+ - gir1.2-gtksource-5
+ - gir1.2-adw-1
+ - gir1.2-spelling-1
  - gir1.2-glib-2.0
- - gir1.2-gspell-1
  - gir1.2-gstreamer-1.0
  - gir1.2-gst-plugins-base-1.0
 

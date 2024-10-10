@@ -27,19 +27,28 @@ import gettext
 from gettext import gettext as _
 import signal
 import inspect
+from typing import Any
 import dbus
+import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gtk, Gdk, GdkPixbuf, GObject
-gi.require_version('GtkSource', '4')
+gi.require_version('Gtk', '4.0')
+gi.require_version('Gdk', '4.0')
+gi.require_version('Adw', '1')
+from gi.repository import GLib, Gtk, Gdk, Gio, Adw
+gi.require_version('GtkSource', '5')
 from gi.repository import GtkSource
-gi.require_version('Gspell', '1')
-from gi.repository import Gspell
+gi.require_version('Spelling', '1')
+from gi.repository import Spelling
+
 
 # Add project root directory to sys.path.
-PROJECT_ROOT_DIRECTORY = os.path.dirname(os.path.dirname(
-    os.path.realpath(inspect.getfile(inspect.currentframe()))))
+current_frame = inspect.currentframe()
+if current_frame is not None:
+    PROJECT_ROOT_DIRECTORY = os.path.dirname(os.path.dirname(
+        os.path.realpath(inspect.getfile(current_frame))))
+else:
+    PROJECT_ROOT_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 if PROJECT_ROOT_DIRECTORY not in sys.path:
     sys.path.insert(0, PROJECT_ROOT_DIRECTORY)
@@ -49,122 +58,140 @@ from gtranscribe.helpers import trim, ns_to_time, time_to_ns, \
     get_data_file
 from gtranscribe.player import gTranscribePlayer
 from gtranscribe.metadata import MetaData
+from gtranscribe.mpris import MPRISInterface
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.textdomain('gTranscribe')
 DBusGMainLoop(set_as_default=True)
 
 # pylint: disable=invalid-name
-class gTranscribeWindow:
+class gTranscribe(Adw.Application):
 
-    def __init__(self, audiofile):
-        self.time_str = '00:00.0'
+    def __init__(self, audiofile: str | None, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.connect('activate', self.on_activate)
+        self.connect('open', self.on_open)
+        self.set_flags(Gio.ApplicationFlags.HANDLES_OPEN)
+        self.time_str: str = '00:00.0'
 
-        self.oldstate = None
-        self.seeking = False
-        self._update_id = None
+        self.oldstate: Any | None = None
+        self.seeking: bool = False
+        self._update_id: int | None = None
 
-        self.filename = None
-        self.md5 = None
+        self.filename: str | None = None
+        self.md5: str | None = None
 
-        self.position = 0
+        self.position: int = 0
 
         # TODO: Make these configurable
-        self.jump_back_interval = datetime.time(second=1)
-        self.seek_interval = datetime.time(second=1)
-
-        self._init_ui()
+        self.jump_back_interval: datetime.time | duration = datetime.time(second=1)
+        self.seek_interval: datetime.time | duration = datetime.time(second=1)
 
         # Initialize database for meta data
         MetaData.init_db(self)
 
-        try:
-            session_bus = dbus.SessionBus()
-            settings_daemon_proxy = session_bus.get_object(
-                'org.gnome.SettingsDaemon.MediaKeys',
-                '/org/gnome/SettingsDaemon/MediaKeys')
-            self.settings_daemon = dbus.Interface(
-                settings_daemon_proxy, 'org.gnome.SettingsDaemon.MediaKeys')
-            self.settings_daemon.GrabMediaPlayerKeys('gTranscribe', 0)
-            self.settings_daemon.connect_to_signal('MediaPlayerKeyPressed',
-                                                   self.on_media_key)
-        except dbus.DBusException:
-            logger.debug("Couldn't register media keys")
-            self.settings_daemon = None
-        self.window.connect('focus-in-event', self.on_focus)
+        self.mpris: MPRISInterface | None = None
 
         # Code for other initialization actions should be added here.
-        self.player = gTranscribePlayer()
+        self.player: gTranscribePlayer = gTranscribePlayer()
         self.player.connect('ready', self.on_file_ready)
         self.player.connect('ended', self.on_file_ended)
         self.player.connect('duration_changed', self.on_duration_changed)
 
-        if audiofile:
-            # Open a file passed as command-line parameter.
-            # Use idle_add so window is settled.
-            GLib.idle_add(self.open_file, audiofile)
+        # Store audiofile to open after UI is initialized
+        self.initial_audiofile = audiofile
 
-    def _init_ui(self):
-        GObject.type_register(GtkSource.View)
-        builder = Gtk.Builder()
-        builder.set_translation_domain('gTranscribe')
-        builder.add_from_file(get_data_file(PROJECT_ROOT_DIRECTORY, 'ui',
-                                            'gTranscribe.glade'))
-        builder.connect_signals(self)
-        self.window = builder.get_object("gtranscribe_window")
+    def on_activate(self, app: Adw.Application) -> None:
+        """Run main application window."""
+        GtkSource.init()
+        ui = get_data_file(PROJECT_ROOT_DIRECTORY, 'ui', 'gTranscribe.ui')
+        builder = Gtk.Builder.new_from_file(ui)
+        self.window = builder.get_object('gtranscribe_window')
+        app.add_window(self.window)
+        self.window.connect("close-request", self.quit)
+        self.window.connect("destroy", self.quit)
 
-        icon_theme = Gtk.IconTheme.get_default()
-        if icon_theme.has_icon('gtranscribe'):
-            icon = icon_theme.load_icon('gtranscribe', 128, 0)
-        else:
-            icon = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                get_data_file(PROJECT_ROOT_DIRECTORY, 'icons', 'scalable',
-                              'apps', 'gtranscribe.svg'), 128, 128, 0)
-        self.window.set_default_icon(icon)
+        # create app actions
+        self.create_action("open", self.open, ("<primary>o",))
+        self.create_action("open_text", self.open_text, None)
+        self.create_action("save", self.save_text, ("<primary>s",))
+        self.create_action("about", self.about, None)
+        self.create_action("toggle_play", self.toggle_play_action, ("<primary>space",))
+        self.create_action("rewind", self.rewind, ("<primary><shift>Left",))
+        self.create_action("forward", self.forward, ("<primary><shift>Right",))
+        self.create_action("inc_speed", self.inc_speed, ("<primary>f",))
+        self.create_action("dec_speed", self.dec_speed, ("<primary>d",))
+        self.create_action("jump", self.jump, ("<primary>j",))
+
+        self.window.present()
 
         self.text_view = builder.get_object("text_view")
-        schecker = Gspell.TextView.get_from_gtk_text_view(self.text_view)
-        Gspell.TextView.basic_setup(schecker)
+        self.text_view.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
         self.text_buffer = self.text_view.get_buffer()
+        checker = Spelling.Checker.get_default()
+        adapter = Spelling.TextBufferAdapter.new(self.text_buffer, checker)
+        extra_menu = adapter.get_menu_model()
+        self.text_view.set_extra_menu(extra_menu)
+        self.text_view.insert_action_group('spelling', adapter)
+        adapter.set_enabled(True)
+        
+        # Add key event controller to text view for timestamp insertion
+        key_event = Gtk.EventControllerKey.new()
+        key_event.connect("key-pressed", self.on_text_insert)
+        self.text_view.add_controller(key_event)
 
         spinbutton_jump = builder.get_object("spinbutton_jump")
-        spinbutton_jump.set_range(0, 5000)
-        spinbutton_jump.set_increments(10, 100)
         spinbutton_jump.set_value(time_to_ns(self.jump_back_interval) /
                                   1000000)
+        spinbutton_jump.connect("value-changed", self.on_jump_value_changed)
 
         self.rewind_button = builder.get_object('button_seek_back')
         self.rewind_button.set_sensitive(False)
+        self.rewind_button.connect("clicked", self.rewind)
         self.forward_button = builder.get_object('button_seek_forward')
         self.forward_button.set_sensitive(False)
-
-        self.rewind_menu = builder.get_object('rewind')
-        self.rewind_menu.set_sensitive(False)
-        self.forward_menu = builder.get_object('forward')
-        self.forward_menu.set_sensitive(False)
-        self.jump_menu = builder.get_object('jump')
-        self.jump_menu.set_sensitive(False)
+        self.forward_button.connect("clicked", self.forward)
 
         self.speedscale = builder.get_object('scale_speed')
         self.speedscale.set_sensitive(False)
+        self.speedscale.connect("value-changed", self.on_scale_speed_value_changed)
 
         self.play_action = builder.get_object("button_play")
         self.play_action.set_sensitive(False)
-        self.play_menu = builder.get_object('play')
-        self.play_menu.set_sensitive(False)
+        self.play_action.connect("toggled", self.play)
         self.slider = builder.get_object('scale_position')
         self.slider.set_sensitive(False)
-        self.icon_play = builder.get_object("icon_play")
+        self.slider.connect("value-changed", self.on_scale_position_value_changed)
 
         self.dur_label = builder.get_object('label_duration')
         self.pos_label = builder.get_object('label_position')
         self.dur_label.set_text(self.time_str)
         self.pos_label.set_text(self.time_str)
 
-    def _get_update_ui(self):
+        volumebutton = builder.get_object("volumebutton")
+        volumebutton.connect("value-changed", self.on_volumebutton_value_changed)
+
+        # Register media keys after window is created
+        self.register_media_keys()
+
+        # Open initial audio file if provided
+        if self.initial_audiofile:
+            GLib.idle_add(self.open_audio_file, self.initial_audiofile)
+
+    def on_open(self, app: Adw.Application, files: list[Gio.File], n_files: int, hint: str) -> None:
+        """Handle opening files from command line or file manager."""
+        # Ensure window is created (activate only if no windows exist)
+        if not self.get_windows():
+            self.activate()
+        if files:
+            file = files[0]
+            audiofile = file.get_path()
+            GLib.idle_add(self.open_audio_file, audiofile)
+
+    def _get_update_ui(self) -> bool:
         return self._update_id is not None
 
-    def _set_update_ui(self, update):
+    def _set_update_ui(self, update: bool) -> None:
         if update:
             self._update_id = GLib.timeout_add(50, self.play_loop)
         else:
@@ -179,44 +206,61 @@ class gTranscribeWindow:
 
     update_ui = property(_get_update_ui, _set_update_ui)
 
+    def register_media_keys(self) -> None:
+        """Register media keys via MPRIS D-Bus interface."""
+        try:
+            session_bus = dbus.SessionBus()
+            bus_name = dbus.service.BusName('org.mpris.MediaPlayer2.gTranscribe',
+                                           bus=session_bus)
+            self.mpris = MPRISInterface(bus_name, self)
+            logger.debug("MPRIS media keys registered successfully")
+        except Exception as e:
+            logger.debug("Couldn't register MPRIS media keys: %s", e)
+            self.mpris = None
+
     # pylint: disable=unused-argument
-    def about(self, action):
-        about_dialog = Gtk.AboutDialog()
-        about_dialog.set_transient_for(self.window)
-        about_dialog.set_modal(True)
-        about_dialog.set_name("gTranscribe")
+    def about(self, action: Gio.SimpleAction, parameter: Any | None) -> None:
+        about_dialog = Adw.AboutDialog()
+        about_dialog.set_application_name("gTranscribe")
         about_dialog.set_version("0.11")
-        about_dialog.set_copyright("Copyright \u00A9 2013-2023 Philip Rinn\n"
-                                   "Copyright \u00A9 2010 Frederik Elwert")
+        about_dialog.set_copyright("\u00A9 2013-2025 Philip Rinn\n"
+                                   "\u00A9 2010 Frederik Elwert")
         about_dialog.set_comments(_("gTranscribe is a software focused "
                                     "on easy transcription of spoken words."))
         about_dialog.set_website("https://github.com/innir/gtranscribe")
-        about_dialog.set_authors(["Philip Rinn <rinni@inventati.org>"])
-        about_dialog.set_license_type(Gtk.License.GPL_3_0)
-        about_dialog.run()
-        about_dialog.destroy()
+        about_dialog.set_developer_name("Philip Rinn")
+        about_dialog.set_license_type(Gtk.License(Gtk.License.GPL_3_0))
+        about_dialog.present()
 
     # pylint: disable=unused-argument
-    def open(self, action):
-        audiofile = get_open_filename(self, _('Open Audio File'),
-                                      _('All Audio Files'), 'audio/*')
-        if audiofile is not None:
-            self.open_file(audiofile)
+    def open(self, action: Gio.SimpleAction, parameter: Any | None) -> None:
+        get_open_filename(self, _('Open Audio File'), _('All Audio Files'), 'audio/*', self.open_file)
 
-    def open_file(self, audiofile):
-        self.play_action.set_active(False)
-        self.slider.set_value(0)
+    def open_file(self, dialog: Gtk.FileDialog, result: Gio.AsyncResult) -> None:
+        try:
+            file = dialog.open_finish(result)
+            if file is not None:
+                audiofile = file.get_path()
+                self.open_audio_file(audiofile)
+        except GLib.Error as error:
+            logger.error(f"Error opening file: {error.message}")
+
+    def open_audio_file(self, audiofile: str) -> None:
+        """Open an audio file from a file path."""
+        if hasattr(self, 'play_action'):
+            self.play_action.set_active(False)
+            self.slider.set_value(0)
         self.md5 = md5_of_file(audiofile)
         # insert md5 into database so we can just update afterwards
         MetaData.store_md5(self)
         self.player.open(audiofile)
 
     # pylint: disable=unused-argument
-    def on_file_ready(self, sig, audiofile):
+    def on_file_ready(self, sig: gTranscribePlayer, audiofile: str) -> None:
         logger.debug('received signal "ready"')
         GLib.idle_add(self.update_file, audiofile)
 
-    def on_duration_changed(self, sig):
+    def on_duration_changed(self, sig: gTranscribePlayer | None) -> None:
         if sig is not None:
             logger.debug('received signal "duration_changed"')
         duration = ns_to_time(self.player.duration)
@@ -230,8 +274,9 @@ class gTranscribeWindow:
         # set position
         self.set_position_label(time_to_ns(duration))
 
-    def update_file(self, audiofile):
+    def update_file(self, audiofile: str) -> None:
         self.position = 0
+        assert self.md5 is not None
         fileinfo = MetaData(audiofile, self.md5)
         if fileinfo.position:
             logger.debug('Resuming at position %s',
@@ -241,8 +286,13 @@ class gTranscribeWindow:
         if fileinfo.speed:
             logger.debug('Resuming with speed %s', fileinfo.speed)
             self.speedscale.set_value(fileinfo.speed)
-        # Query duration once before we start playing
-        self.on_duration_changed(None)
+        # Query duration - retry if not available yet
+        duration = self.player.duration
+        if duration > 0:
+            self.on_duration_changed(None)
+        else:
+            # Duration not available yet, try again in a moment
+            GLib.timeout_add(100, self._update_file_duration)
         # set window title
         filename = os.path.basename(audiofile)
         self.window.set_title(f"gTranscribe \u2013 {filename}")
@@ -250,14 +300,18 @@ class gTranscribeWindow:
         self.slider.set_sensitive(True)
         self.rewind_button.set_sensitive(True)
         self.forward_button.set_sensitive(True)
-        self.play_menu.set_sensitive(True)
-        self.rewind_menu.set_sensitive(True)
-        self.forward_menu.set_sensitive(True)
-        self.jump_menu.set_sensitive(True)
         self.speedscale.set_sensitive(True)
 
+    def _update_file_duration(self) -> bool:
+        """Retry updating duration if it wasn't available initially."""
+        duration = self.player.duration
+        if duration > 0:
+            self.on_duration_changed(None)
+            return False  # Stop retrying
+        return True  # Keep retrying
+
     # pylint: disable=unused-argument
-    def on_file_ended(self, sig):
+    def on_file_ended(self, sig: gTranscribePlayer) -> None:
         logger.debug('received signal "ended"')
         # Automatically save text if a filename is given to avoid data loss
         if self.filename is not None:
@@ -265,39 +319,19 @@ class gTranscribeWindow:
         self.player.reset()
         self.play_action.set_active(False)
 
-    def on_media_key(self, application, key):
-        logger.debug('Received media key %s for %s', key, application)
-        if application == 'gTranscribe':
-            if key == 'Play':
-                if self.slider.is_sensitive():
-                    self.play_action.activate()
-            elif key in ('Stop', 'Pause'):
-                self.play_action.set_active(False)
-            elif key == 'Next':
-                if self.forward_button.is_sensitive():
-                    self.forward(None)
-            elif key == 'Previous':
-                if self.rewind_button.is_sensitive():
-                    self.rewind(None)
-
     # pylint: disable=unused-argument
-    def on_focus(self, widget, event):
-        if self.settings_daemon:
-            self.settings_daemon.GrabMediaPlayerKeys('gTranscribe', 0)
-
-    # pylint: disable=unused-argument
-    def toggle_play_action(self, action):
+    def toggle_play_action(self, action: Gio.SimpleAction, parameter: Any | None = None) -> None:
         """Toggle play button when activated via shortcut"""
         if self.play_action.get_active():
             self.play_action.set_active(False)
         else:
             self.play_action.set_active(True)
 
-    def play(self, action):
+    def play(self, action: Gtk.ToggleButton) -> None:
         if action.get_active():
             logger.debug('play action triggered')
-            self.icon_play.set_from_icon_name(Gtk.STOCK_MEDIA_PAUSE, 2)
-            self.play_menu.set_label(_("Pause"))
+            self.play_action.set_icon_name("media-playback-pause-symbolic")
+            #self.play_menu.set_label(_("Pause"))
             # It's not resuming at the correct position if we don't set the
             # position explicitly
             self.player.position = self.position
@@ -306,8 +340,8 @@ class gTranscribeWindow:
             self._set_update_ui(True)
         else:
             logger.debug('pause action triggered')
-            self.icon_play.set_from_icon_name(Gtk.STOCK_MEDIA_PLAY, 2)
-            self.play_menu.set_label(_("Play"))
+            self.play_action.set_icon_name("media-playback-start-symbolic")
+            #self.play_menu.set_label(_("Play"))
             self.window.update_ui = False
             self._set_update_ui(False)
             self.player.pause()
@@ -317,7 +351,7 @@ class gTranscribeWindow:
                 fileinfo = MetaData(self.player.filename, self.md5)
                 fileinfo.position = self.position
 
-    def play_loop(self, once=False, update_scale=True):
+    def play_loop(self, once: bool = False, update_scale: bool = True) -> bool:
         try:
             self.position = self.player.position
         except:
@@ -333,10 +367,11 @@ class gTranscribeWindow:
             return False
         return True
 
-    def set_position_label(self, duration, update_scale=True):
+    def set_position_label(self, duration: int, update_scale: bool = True) -> None:
         if duration > 0:
             frac = float(self.position) / float(duration)
             if update_scale:
+                self.seeking = False
                 scalepos = frac * self.slider.get_adjustment().get_upper()
                 self.slider.set_value(scalepos)
             pos_str = trim(ns_to_time(self.position).strftime(self.time_str))
@@ -344,22 +379,22 @@ class gTranscribeWindow:
         else:
             logger.warning("Can't update position, don't know the duration")
 
-    def dec_speed(self, action):
+    def dec_speed(self, action: Gio.SimpleAction, parameter: Any | None = None) -> None:
         self.speedscale.set_value(self.speedscale.get_value() - 0.1)
 
-    def inc_speed(self, action):
+    def inc_speed(self, action: Gio.SimpleAction, parameter: Any | None = None) -> None:
         self.speedscale.set_value(self.speedscale.get_value() + 0.1)
 
-    def forward(self, action=None, user_data=None):
+    def forward(self, action: Any | None = None, parameter: Any | None = None) -> None:
         self.player.move_position(time_to_ns(self.seek_interval))
         GLib.idle_add(self.play_loop, True)
 
-    def rewind(self, action=None, user_data=None):
+    def rewind(self, action: Any | None = None, parameter: Any | None = None) -> None:
         self.player.move_position(-time_to_ns(self.seek_interval))
         GLib.idle_add(self.play_loop, True)
 
     # pylint: disable=unused-argument
-    def jump(self, action):
+    def jump(self, action: Gio.SimpleAction, parameter: Any | None = None) -> None:
         # Only do this if an audio file is already loaded
         if self.md5 is not None:
             # Get the current cursor position
@@ -375,33 +410,30 @@ class gTranscribeWindow:
                 self.text_buffer.get_iter_at_offset(line_start - 1), True)
             logger.debug('Try to get the position from %s', pos)
             # pylint: disable=anomalous-backslash-in-string
-            pos_tag = re.compile('\[\d\d:\d\d.\d\]')
+            pos_tag = re.compile(r'\[\d\d:\d\d.\d\]')
             if pos_tag.match(pos):
                 pos = pos[-8:-1]
                 # pylint: disable=anomalous-backslash-in-string
-                pos_tag = re.compile('\d\d:\d\d.\d')
+                pos_tag = re.compile(r'\d\d:\d\d.\d')
                 if pos_tag.match(pos):
                     self.player.position = time_to_ns(
-                        datetime.datetime.strptime(pos, "%M:%S.%f"))
+                        datetime.datetime.strptime(pos, "%M:%S.%f").time())
                     GLib.idle_add(self.play_loop, True)
                     self.text_buffer.place_cursor(
                         self.text_buffer.get_iter_at_offset(line_start))
                     logger.debug('Set position')
 
-    # pylint: disable=unused-argument
-    def on_scale_speed_format_value(self, widget, value, data=None):
-        return f"{locale.format_string('%.1f', value)}\xd7"
-
-    def on_scale_speed_value_changed(self, speed):
+    def on_scale_speed_value_changed(self, speed: Gtk.Scale) -> None:
         value = speed.get_value()
         if (value != self.player.rate) and (self.md5 is not None):
             self.player.rate = value
             fileinfo = MetaData(self.player.filename, self.md5)
             fileinfo.speed = value
 
-    def on_scale_position_value_changed(self, rel_position):
+    def on_scale_position_value_changed(self, rel_position: Gtk.Scale) -> None:
         if not self.seeking:
-            # Slider changed without user action, do nothing
+            # Slider changed programmatically, enable seeking for next user change
+            self.seeking = True
             return
         value = rel_position.get_value()
         max_value = self.slider.get_adjustment().get_upper()
@@ -411,57 +443,45 @@ class gTranscribeWindow:
         GLib.idle_add(self.play_loop, True, False)
 
     # pylint: disable=unused-argument
-    def on_scale_position_button_press_event(self, widget, event):
-        logger.debug('Begin seeking')
-        self.oldstate = self.player.state
-        self.player.pause()
-        self.seeking = True
-
-    # pylint: disable=unused-argument
-    def on_scale_position_button_release_event(self, widget, event):
-        logger.debug('End seeking')
-        self.seeking = False
-        self.player.state = self.oldstate
-        if not self.player.playing:
-            self.window.update_ui = False
-            self._set_update_ui(False)
-        else:
-            self.window.update_ui = True
-            self._set_update_ui(True)
-
-    # pylint: disable=unused-argument
-    def on_volumebutton_value_changed(self, scalebutton, value):
+    def on_volumebutton_value_changed(self, scalebutton: Gtk.VolumeButton, value: float) -> None:
         self.player.volume = value
 
-    def quit(self, widget, data=None):
+    def quit(self, widget: Adw.ApplicationWindow, data: Any | None = None) -> None:
         """Signal handler for closing the gTranscribeWindow."""
         self.on_destroy(widget, data=None)
 
     # pylint: disable=unused-argument
-    def on_destroy(self, widget, data=None):
+    def on_destroy(self, widget: Adw.ApplicationWindow, data: Any | None = None) -> None:
         """Called when the gTranscribeWindow is closed."""
         # Clean up code for saving application state should be added here.
-        if self.player.filename is not None:
+        if self.player.filename is not None and self.md5 is not None:
             fileinfo = MetaData(self.player.filename, self.md5)
             fileinfo.position = self.position
             fileinfo.speed = self.player.rate
-        if self.settings_daemon is not None:
-            self.settings_daemon.ReleaseMediaPlayerKeys('gTranscribe')
-        Gtk.main_quit()
+        if self.mpris is not None:
+            self.mpris.remove_from_connection()
 
-    def on_jump_value_changed(self, range):
-        self.jump_back_interval = ns_to_time(range.get_value_as_int() *
-                                             1000000)
+    def on_jump_value_changed(self, range: Gtk.SpinButton) -> None:
+        self.jump_back_interval = ns_to_time(range.get_value_as_int() * 1000000)
 
     # pylint: disable=unused-argument
-    def open_text(self, action):
+    def open_text(self, action: Gio.SimpleAction, parameter: Any | None) -> None:
         """
         Called when the user clicks the 'Open Text' menu.
         The previous contents of the GtkTextView is overwritten.
         """
         self.filename = None
-        self.filename = get_open_filename(self, _("Open Text File"),
-                                          _('Plain Text Files'), 'text/plain')
+        get_open_filename(self, _("Open Text File"),
+                                          _('Plain Text Files'), 'text/plain', self.open_text_callback)
+    
+    def open_text_callback(self, dialog: Gtk.FileDialog, result: Gio.AsyncResult) -> None:
+        try:
+            file = dialog.open_finish(result)
+            if file is not None:
+                self.filename = file.get_path()
+        except GLib.Error as error:
+            logger.error(f"Error opening file: {error.message}")
+
         if self.filename is not None:
             # get the file contents
             with open(file=self.filename, mode="r", encoding="utf_8") as fin:
@@ -472,15 +492,16 @@ class gTranscribeWindow:
                 pos = text[-15:]
                 logger.debug('Try to get the last position from %s', pos)
                 # pylint: disable=anomalous-backslash-in-string
-                pos_tag = re.compile('.*[\[#]((\d\d:)?\d\d:\d\d[-.]\d)[\]#]')
-                if pos_tag.match(pos):
-                    pos = pos_tag.match(pos).group(1).replace("-", ".")
+                pos_tag = re.compile(r'.*[\[#]((\d?\d:)?\d\d:\d\d([-.]\d)?)[\]#]')
+                match = pos_tag.match(pos)
+                if match:
+                    pos = match.group(1).replace("-", ".")
                     if len(pos) == 10:
                         time_str = "%H:%M:%S.%f"
                     else:
                         time_str = "%M:%S.%f"
                     self.player.position = time_to_ns(
-                        datetime.datetime.strptime(pos, time_str))
+                        datetime.datetime.strptime(pos, time_str).time())
                     GLib.idle_add(self.play_loop, True)
                     logger.debug('Set position on load to %s', pos)
             # disable the text view while loading the buffer with the text
@@ -493,13 +514,28 @@ class gTranscribeWindow:
                           self.text_buffer.get_insert())
 
     # pylint: disable=unused-argument
-    def save_text(self, action):
+    def save_text(self, action: Any, parameter: Any | None = None) -> None:
         """
         Called when the user clicks the 'Save' menu. We need to allow the
         user to choose a file to save if it's an untitled document.
         """
         if self.filename is None:
-            self.filename = get_save_filename(self)
+            get_save_filename(self)
+        else:
+            self.save_text_real()
+    
+    def save_dialog_callback(self, dialog: Gtk.FileDialog, result: Gio.AsyncResult) -> None:
+        try:
+            file = dialog.save_finish(result)
+            if file is not None:
+                self.filename = file.get_path()
+                self.save_text_real()
+        except GLib.Error as error:
+            logger.error(f"Error saving file: {error.message}")
+
+    def save_text_real(self) -> None:
+        if self.filename is None:
+            return
         try:
             # disable text view while getting contents of buffer
             self.text_view.set_sensitive(False)
@@ -516,24 +552,32 @@ class gTranscribeWindow:
             error_message(self, f"Could not save file: {self.filename}")
 
     # pylint: disable=unused-argument
-    def on_text_insert(self, widget, event):
-        keyname = Gdk.keyval_name(event.keyval)
+    def on_text_insert(self, event: Gtk.EventControllerKey, keyval: int, keycode: int, state: Gdk.ModifierType) -> bool:
+        keyname = Gdk.keyval_name(keyval)
         if (keyname in ('Return', 'F8')) and self.position > 0:
             pos_str = ' #' + trim(ns_to_time(
                 self.position).strftime(self.time_str.replace(".", "-"))) + '#'
             self.text_buffer.insert_at_cursor(pos_str)
+            # For Return key, also insert newline; for F8, just the timestamp
+            if keyname == 'Return':
+                self.text_buffer.insert_at_cursor('\n')
+            return True  # Consume the event
         # handling for yellow foot switch "science" from cleware
         if keyname == 'F9':
             if self.slider.is_sensitive():
                 self.play_action.activate()
+            return True  # Consume the event
         elif keyname == 'F4':
             self.play_action.set_active(False)
+            return True  # Consume the event
+        return False  # Let other keys propagate
 
-    def main(self):
-        """Run main application window."""
-        self.window.connect('key_press_event', self.on_text_insert)
-        self.window.show()
-        Gtk.main()
+    def create_action(self, name: str, callback: Any, shortcuts: tuple[str, ...] | None) -> None:
+        action = Gio.SimpleAction.new(name, None)
+        action.connect("activate", callback)
+        self.add_action(action)
+        if shortcuts:
+            self.set_accels_for_action(f"app.{name}", shortcuts)
 
 
 if __name__ == "__main__":
@@ -555,9 +599,9 @@ if __name__ == "__main__":
         audio_file = args.file
 
     # Catch Ctrl+C and quit the program
-    signal.signal(signal.SIGINT, lambda a, b: gtranscriber.quit(gtranscriber))
+    app = gTranscribe(audio_file)
+    signal.signal(signal.SIGINT, lambda a, b: app.quit(None))
     GLib.timeout_add(500, lambda: True)
 
     # Run the application
-    gtranscriber = gTranscribeWindow(audio_file)
-    gtranscriber.main()
+    app.run(sys.argv)

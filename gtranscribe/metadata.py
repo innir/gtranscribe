@@ -17,6 +17,7 @@
 import sqlite3
 import os.path
 import logging
+from typing import Any, Dict
 from gi.repository import GLib
 logger = logging.getLogger('fileinfo')
 
@@ -32,12 +33,12 @@ class MetaData():
     interface.
     """
 
-    def __init__(self, filepath, md5):
+    def __init__(self, filepath: str, md5: str) -> None:
         self.filepath = filepath
         self.md5 = md5
-        self._cache = {}
+        self._cache: Dict[str, Any] = {}
 
-    def _get_data(self, attribute):
+    def _get_data(self, attribute: str) -> Any:
         """Hide the verbose process of getting attributes."""
         # Use cached values if available to limit requests
         if attribute in self._cache:
@@ -53,7 +54,7 @@ class MetaData():
         logger.debug('Get attribute "%s": %s', attribute, value)
         return value
 
-    def _set_data(self, attribute, value):
+    def _set_data(self, attribute: str, value: Any) -> None:
         """Hide the verbose process of setting attributes."""
         logger.debug('Set attribute "%s": %s', attribute, value)
         query = 'UPDATE metadata SET ' + attribute + '=? WHERE md5=?'
@@ -65,30 +66,28 @@ class MetaData():
         con.close()
         self._cache[attribute] = value
 
-    def _get_position(self):
+    def _get_position(self) -> int:
         position = self._get_data("position")
         if not isinstance(position, int):
             position = 0
         return position
 
-    def _set_position(self, position):
+    def _set_position(self, position: int) -> None:
         self._set_data("position", position)
-        return True
 
-    def _get_speed(self):
+    def _get_speed(self) -> float:
         speed = self._get_data("speed")
         if not isinstance(speed, float):
             speed = 1.0
         return speed
 
-    def _set_speed(self, speed):
+    def _set_speed(self, speed: float) -> None:
         self._set_data("speed", speed)
-        return True
 
     position = property(_get_position, _set_position)
     speed = property(_get_speed, _set_speed)
 
-    def store_md5(self):
+    def store_md5(self) -> None:
         """Store the given md5 hash in the database for meta data."""
         con = sqlite3.connect(database)
         cur = con.cursor()
@@ -98,7 +97,7 @@ class MetaData():
         cur.close()
         con.close()
 
-    def init_db(self):
+    def init_db(self) -> None:
         """Create the database for meta data if necessary."""
         # make sure our cache directory exists
         if not os.path.exists(cache_dir):

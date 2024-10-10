@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.94.1 -->
+<interface domain="gTranscribe">
+  <!-- interface-name gTranscribe.ui -->
+  <requires lib="gtk" version="4.8"/>
+  <requires lib="gio" version="2.0"/>
+  <requires lib="libadwaita" version="1.7"/>
+  <object class="GtkAdjustment" id="adjustment_seek">
+    <property name="page-increment">1.0</property>
+    <property name="step-increment">0.1</property>
+    <property name="upper">1.0</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment_speed">
+    <property name="lower">0.5</property>
+    <property name="page-increment">0.1</property>
+    <property name="step-increment">0.1</property>
+    <property name="upper">1.5</property>
+    <property name="value">1.0</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment_jump">
+    <property name="lower">0</property>
+    <property name="page-increment">10</property>
+    <property name="step-increment">10</property>
+    <property name="upper">5000</property>
+    <property name="value">1000</property>
+  </object>
+  <menu id="main_menu">
+    <item>
+      <attribute name="action">app.open</attribute>
+      <attribute name="label" translatable="yes">Open</attribute>
+    </item>
+    <item>
+      <attribute name="action">app.open_text</attribute>
+      <attribute name="label" translatable="yes">Open Text</attribute>
+    </item>
+    <item>
+      <attribute name="action">app.save</attribute>
+      <attribute name="label" translatable="yes">Save</attribute>
+    </item>
+    <item>
+      <attribute name="action">app.about</attribute>
+      <attribute name="label" translatable="yes">About</attribute>
+    </item>
+  </menu>
+  <object class="AdwWindow" id="gtranscribe_window">
+    <property name="default-height">800</property>
+    <property name="default-width">600</property>
+    <property name="title">gTranscribe</property>
+    <child>
+      <object class="AdwToolbarView" id="toolbar_view">
+        <child type="top">
+          <object class="AdwHeaderBar" id="header_bar">
+            <child type="start">
+              <object class="GtkButton" id="open_button">
+                <property name="action-name">app.open</property>
+                <property name="label" translatable="yes">Open</property>
+              </object>
+            </child>
+            <child type="end">
+              <object class="GtkMenuButton" id="menu_button">
+                <property name="icon-name">open-menu-symbolic</property>
+                <property name="menu-model">main_menu</property>
+                <property name="primary">True</property>
+              </object>
+            </child>
+            <child type="end">
+              <object class="GtkButton" id="save_button">
+                <property name="action-name">app.save</property>
+                <property name="label" translatable="yes">Save</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <property name="content">
+          <object class="GtkBox" id="window">
+            <property name="orientation">vertical</property>
+            <property name="spacing">12</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">12</property>
+            <property name="margin-bottom">12</property>
+            <child>
+              <object class="GtkBox" id="row1">
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkLabel" id="label_position">
+                    <property name="label">00:00.0</property>
+                    <property name="width-chars">6</property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="button_seek_back">
+                    <property name="icon-name">media-seek-backward-symbolic</property>
+                    <property name="has-frame">False</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkScale" id="scale_position">
+                    <property name="adjustment">adjustment_seek</property>
+                    <property name="hexpand">True</property>
+                    <property name="draw-value">False</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="button_seek_forward">
+                    <property name="icon-name">media-seek-forward-symbolic</property>
+                    <property name="has-frame">False</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label_duration">
+                    <property name="label">00:00.0</property>
+                    <property name="width-chars">6</property>
+                    <property name="xalign">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="row2">
+                <property name="spacing">12</property>
+                <child>
+                  <object class="GtkToggleButton" id="button_play">
+                    <property name="icon-name">media-playback-start-symbolic</property>
+                    <property name="has-frame">False</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="spacing">6</property>
+                    <property name="valign">center</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label" translatable="yes">Speed:</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkScale" id="scale_speed">
+                        <property name="adjustment">adjustment_speed</property>
+                        <property name="draw-value">True</property>
+                        <property name="has-origin">False</property>
+                        <property name="tooltip-text" translatable="yes">Change playback speed</property>
+                        <property name="value-pos">right</property>
+                        <property name="width-request">100</property>
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="spacing">6</property>
+                    <property name="valign">center</property>
+                    <child>
+                      <object class="GtkLabel" id="label_jump">
+                        <property name="label" translatable="yes">Resume interval:</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSpinButton" id="spinbutton_jump">
+                        <property name="adjustment">adjustment_jump</property>
+                        <property name="climb-rate">10.0</property>
+                        <property name="numeric">True</property>
+                        <property name="tooltip-text" translatable="yes">Change the time to jump back on resume in ms</property>
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label_ms">
+                        <property name="label" translatable="yes">ms</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkVolumeButton" id="volumebutton">
+                    <property name="halign">end</property>
+                    <property name="hexpand">True</property>
+                    <property name="value">1.0</property>
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="text_window">
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+                <property name="has-frame">True</property>
+                <child>
+                  <object class="GtkSourceView" id="text_view">
+                    <property name="top-margin">6</property>
+                    <property name="bottom-margin">6</property>
+                    <property name="left-margin">6</property>
+                    <property name="right-margin">6</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </child>
+  </object>
+</interface>
