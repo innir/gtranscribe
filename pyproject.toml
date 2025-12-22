@@ -1,0 +1,57 @@
+[build-system]
+requires = ["meson-python", "meson >= 0.59.0"]
+build-backend = "mesonpy"
+
+[project]
+name = "gTranscribe"
+version = "0.11"
+description = "Software focused on easy transcription of spoken words"
+readme = "README"
+license = {text = "GPL-3.0-or-later"}
+authors = [
+    {name = "Philip Rinn", email = "rinni@inventati.org"},
+]
+maintainers = [
+    {name = "Philip Rinn", email = "rinni@inventati.org"},
+]
+keywords = ["audio", "transcription", "gtk", "gnome"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: X11 Applications :: GTK",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "PyGObject",
+    "dbus-python",
+]
+
+[project.urls]
+Homepage = "https://github.com/innir/gtranscribe"
+Repository = "https://github.com/innir/gtranscribe"
+Issues = "https://github.com/innir/gtranscribe/issues"
+
+[tool.meson-python]
+# Meson options can be set here if needed
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+ignore_missing_imports = true
+show_error_codes = true
+pretty = true
+
+# Per-module options for stricter checking in our code
+[[tool.mypy.overrides]]
+module = "gtranscribe.*"
+ignore_missing_imports = true
