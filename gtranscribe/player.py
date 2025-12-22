@@ -18,7 +18,7 @@
 import logging
 import gi
 gi.require_version('Gst', '1.0')
-from gi.repository import Gst, GObject
+from gi.repository import Gst, GObject # NOQA: E402
 logger = logging.getLogger('player')
 Gst.init(None)
 

@@ -35,11 +35,11 @@ import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Gdk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import GLib, Gtk, Gdk, Gio, Adw
+from gi.repository import GLib, Gtk, Gdk, Gio, Adw # NOQA: E402
 gi.require_version('GtkSource', '5')
-from gi.repository import GtkSource
+from gi.repository import GtkSource # NOQA: E402
 gi.require_version('Spelling', '1')
-from gi.repository import Spelling
+from gi.repository import Spelling # NOQA: E402
 
 
 # Add project root directory to sys.path.
@@ -53,12 +53,12 @@ else:
 if PROJECT_ROOT_DIRECTORY not in sys.path:
     sys.path.insert(0, PROJECT_ROOT_DIRECTORY)
 
-from gtranscribe.helpers import trim, ns_to_time, time_to_ns, \
-    get_open_filename, get_save_filename, error_message, md5_of_file, \
-    get_data_file
-from gtranscribe.player import gTranscribePlayer
-from gtranscribe.metadata import MetaData
-from gtranscribe.mpris import MPRISInterface
+from gtranscribe.helpers import (trim, ns_to_time, time_to_ns, # NOQA: E402
+    get_open_filename, get_save_filename, error_message, md5_of_file, 
+    get_data_file)
+from gtranscribe.player import gTranscribePlayer # NOQA: E402
+from gtranscribe.metadata import MetaData # NOQA: E402
+from gtranscribe.mpris import MPRISInterface # NOQA: E402
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.textdomain('gTranscribe')
