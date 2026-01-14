@@ -115,6 +115,7 @@ class gTranscribe(Adw.Application):
         self.create_action("open", self.open, ("<primary>o",))
         self.create_action("open_text", self.open_text, None)
         self.create_action("save", self.save_text, ("<primary>s",))
+        self.create_action("shortcuts", self.show_shortcuts, ("<primary>question",))
         self.create_action("about", self.about, None)
         self.create_action("toggle_play", self.toggle_play_action, ("<primary>space",))
         self.create_action("rewind", self.rewind, ("<primary><shift>Left",))
@@ -231,6 +232,14 @@ class gTranscribe(Adw.Application):
         about_dialog.set_developer_name("Philip Rinn")
         about_dialog.set_license_type(Gtk.License(Gtk.License.GPL_3_0))
         about_dialog.present()
+
+    # pylint: disable=unused-argument
+    def show_shortcuts(self, action: Gio.SimpleAction, parameter: Any | None) -> None:
+        shortcuts_ui = get_data_file(PROJECT_ROOT_DIRECTORY, 'ui', 'shortcuts.ui')
+        builder = Gtk.Builder.new_from_file(shortcuts_ui)
+        shortcuts_window = builder.get_object('shortcuts_window')
+        shortcuts_window.set_transient_for(self.window)
+        shortcuts_window.present()
 
     # pylint: disable=unused-argument
     def open(self, action: Gio.SimpleAction, parameter: Any | None) -> None:
