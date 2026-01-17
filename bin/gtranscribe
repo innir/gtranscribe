@@ -409,19 +409,22 @@ class gTranscribe(Adw.Application):
                 self.text_buffer.get_iter_at_offset(line_start - 10),
                 self.text_buffer.get_iter_at_offset(line_start - 1), True)
             logger.debug('Try to get the position from %s', pos)
+            # Match both [HH:MM:SS.F] or [MM:SS.F] and #HH:MM:SS-F# or #MM:SS-F# formats
             # pylint: disable=anomalous-backslash-in-string
-            pos_tag = re.compile(r'\[\d\d:\d\d.\d\]')
-            if pos_tag.match(pos):
-                pos = pos[-8:-1]
-                # pylint: disable=anomalous-backslash-in-string
-                pos_tag = re.compile(r'\d\d:\d\d.\d')
-                if pos_tag.match(pos):
-                    self.player.position = time_to_ns(
-                        datetime.datetime.strptime(pos, "%M:%S.%f").time())
-                    GLib.idle_add(self.play_loop, True)
-                    self.text_buffer.place_cursor(
-                        self.text_buffer.get_iter_at_offset(line_start))
-                    logger.debug('Set position')
+            pos_tag = re.compile(r'.*[\[#]((\d?\d:)?\d\d:\d\d([-.]\d)?)[\]#]')
+            match = pos_tag.match(pos)
+            if match:
+                pos = match.group(1).replace("-", ".")
+                if len(pos) == 10:
+                    time_str = "%H:%M:%S.%f"
+                else:
+                    time_str = "%M:%S.%f"
+                self.player.position = time_to_ns(
+                    datetime.datetime.strptime(pos, time_str).time())
+                GLib.idle_add(self.play_loop, True)
+                self.text_buffer.place_cursor(
+                    self.text_buffer.get_iter_at_offset(line_start))
+                logger.debug('Set position to %s', pos)
 
     def on_scale_speed_value_changed(self, speed: Gtk.Scale) -> None:
         value = speed.get_value()
