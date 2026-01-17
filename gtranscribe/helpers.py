@@ -75,9 +75,9 @@ class duration:
         Probably not what you think it is :-(.
         It just implements what's needed for gTranscribe.
         """
-        txt = fmt_string.replace("%H", str(self._hour))  # type: ignore[attr-defined]
-        txt = txt.replace("%M", str(self._minute))  # type: ignore[attr-defined]
-        txt = txt.replace("%S", str(self._second))  # type: ignore[attr-defined]
+        txt = fmt_string.replace("%H", f"{self._hour:02d}")  # type: ignore[attr-defined]
+        txt = txt.replace("%M", f"{self._minute:02d}")  # type: ignore[attr-defined]
+        txt = txt.replace("%S", f"{self._second:02d}")  # type: ignore[attr-defined]
         txt = txt.replace("%f", str(self._microsecond))  # type: ignore[attr-defined]
         return txt
 
