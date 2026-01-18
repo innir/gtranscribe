@@ -363,13 +363,13 @@ class gTranscribe(Adw.Application):
     def play_loop(self, once: bool = False, update_scale: bool = True) -> bool:
         try:
             self.position = self.player.position
-        except:
-            logger.warning("query failed, can't get current position")
+        except (AttributeError, TypeError) as e:
+            logger.warning("query failed, can't get current position: %s", e)
             return False
         try:
             duration = self.player.duration
-        except:
-            logger.warning("query failed, can't get file duration")
+        except (AttributeError, TypeError) as e:
+            logger.warning("query failed, can't get file duration: %s", e)
             return False
         self.set_position_label(duration, update_scale)
         if once:
@@ -559,8 +559,9 @@ class gTranscribe(Adw.Application):
             with open(file=self.filename, mode="w", encoding="utf_8") as fout:
                 fout.write(text)
             self.text_view.grab_focus()
-        except:
+        except OSError as e:
             # error writing file, show message to user
+            logger.error("Could not save file %s: %s", self.filename, e)
             error_message(self, f"Could not save file: {self.filename}")
 
     # pylint: disable=unused-argument
