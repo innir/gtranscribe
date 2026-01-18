@@ -55,7 +55,7 @@ if PROJECT_ROOT_DIRECTORY not in sys.path:
 
 from gtranscribe.helpers import (trim, ns_to_time, time_to_ns, # NOQA: E402
     get_open_filename, get_save_filename, error_message, md5_of_file, 
-    get_data_file)
+    get_data_file, duration)
 from gtranscribe.player import gTranscribePlayer # NOQA: E402
 from gtranscribe.metadata import MetaData # NOQA: E402
 from gtranscribe.mpris import MPRISInterface # NOQA: E402
