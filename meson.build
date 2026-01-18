@@ -1,5 +1,5 @@
 project('gtranscribe',
-  version: '0.11',
+  version: '0.20',
   meson_version: '>= 0.59.0',
   license: 'GPL-3.0-or-later',
 )

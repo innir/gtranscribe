@@ -4,7 +4,7 @@ build-backend = "mesonpy"
 
 [project]
 name = "gTranscribe"
-version = "0.11"
+version = "0.20"
 description = "Software focused on easy transcription of spoken words"
 readme = "README"
 license = {text = "GPL-3.0-or-later"}

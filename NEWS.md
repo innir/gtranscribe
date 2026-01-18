@@ -1,3 +1,40 @@
+gTranscribe 0.20 Release Notes
+=============================
+
+Major changes
+-------------
+
+  * Migrate to GTK4.
+    [[7629692](https://github.com/innir/gtranscribe/commit/7629692)]
+
+
+Bug fixes
+---------
+
+  * Document available shortcuts.
+    [[a7504e2](https://github.com/innir/gtranscribe/commit/a7504e2)]
+
+  * Add zero-padding for H/M/S in duration.strftime.
+    [[5ba6afd](https://github.com/innir/gtranscribe/commit/5ba6afd)]
+
+  * Update regex to support resuming from both timestamp formats.
+    [[b76b819](https://github.com/innir/gtranscribe/commit/b76b819)]
+
+
+Maintenance
+-----------
+
+  * Migrate to meson build system.
+    [[13c43cc](https://github.com/innir/gtranscribe/commit/13c43cc)]
+
+  * Use ruff for linting.
+    [[f763f9f](https://github.com/innir/gtranscribe/commit/f763f9f)]
+
+  * Update German translation.
+    [[b3cf8df](https://github.com/innir/gtranscribe/commit/b3cf8df)]
+
+
+
 gTranscribe 0.11 Release Notes
 =============================
 
