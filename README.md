@@ -21,49 +21,25 @@ Audio player designed to make the transcription of interviews and other sources 
 
 ### Build Dependencies
 
-For building from source with Meson:
 - Meson >= 0.59.0 (`meson`)
 - Ninja build system (`ninja-build`)
 - Python 3 (`python3`)
 - Gettext tools for translations (`gettext`)
 - Desktop file utilities (`desktop-file-utils`)
-- GLib compile schemas (`libglib2.0-dev-bin`)
-- AppStream CLI for appdata validation (`appstream`)
 - GTK icon cache tool (`gtk-update-icon-cache`)
-
-Additionally for building from source with pip:
-- meson-python (`python3-mesonpy` or Python package)
-- build (`python3-build` or Python package, recommended)
+- (Optional) AppStream CLI for appdata validation (`appstream`)
 
 ### Recommended
 - GStreamer bad plugins (`gstreamer1.0-plugins-bad`)
 
 ## Building and Installing
 
-### Using Meson (recommended for distributions)
+### Using Meson
 
 ```bash
 meson setup builddir
 meson compile -C builddir
 meson install -C builddir
-```
-
-### Using pip (for Python users)
-
-Install build dependencies first:
-```bash
-pip install meson-python build
-```
-
-Then install gTranscribe:
-```bash
-pip install .
-```
-
-Or build a wheel:
-```bash
-python3 -m build
-pip install dist/*.whl
 ```
 
 ### Development/Running from source
