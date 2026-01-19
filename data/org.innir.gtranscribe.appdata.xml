@@ -3,9 +3,13 @@
   <id>org.innir.gtranscribe.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
-  <developer_name>Philip Rinn</developer_name>
   <name>gTranscribe</name>
   <summary>A simple GTK+ tool focused on easy transcription of spoken words</summary>
+  <developer id="org.innir">
+    <name>Philip Rinn</name>
+  </developer>
+  <launchable type="desktop-id">org.innir.gtranscribe.desktop</launchable>
+  <content_rating type="oars-1.1" />
   <description>
     <p>
       gTranscribe is a simple GTK+ tool to transcribe audio files and other
@@ -16,7 +20,7 @@
   </description>
  <screenshots>
   <screenshot type="default">
-   <image width="507" height="587">https://screenshots.debian.net/screenshots/000/014/853/large.png</image>
+   <image width="507" height="587">https://screenshots.debian.net/screenshot/gtranscribe/14853</image>
    <caption>The main window of gTranscribe</caption>
   </screenshot>
  </screenshots>
