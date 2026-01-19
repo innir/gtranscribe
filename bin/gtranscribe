@@ -117,7 +117,8 @@ class gTranscribe(Adw.Application):
         self.create_action("save", self.save_text, ("<primary>s",))
         self.create_action("shortcuts", self.show_shortcuts, ("<primary>question",))
         self.create_action("about", self.about, None)
-        self.create_action("toggle_play", self.toggle_play_action, ("<primary>space",))
+        self.create_action("toggle_play", self.toggle_play_action, ("<primary>space", "F9"))
+        self.create_action("pause", self.pause_action, ("F4",))
         self.create_action("rewind", self.rewind, ("<primary><shift>Left",))
         self.create_action("forward", self.forward, ("<primary><shift>Right",))
         self.create_action("inc_speed", self.inc_speed, ("<primary>f",))
@@ -331,10 +332,15 @@ class gTranscribe(Adw.Application):
     # pylint: disable=unused-argument
     def toggle_play_action(self, action: Gio.SimpleAction, parameter: Any | None = None) -> None:
         """Toggle play button when activated via shortcut"""
-        if self.play_action.get_active():
-            self.play_action.set_active(False)
-        else:
-            self.play_action.set_active(True)
+        if self.slider.is_sensitive():
+            if self.play_action.get_active():
+                self.play_action.set_active(False)
+            else:
+                self.play_action.set_active(True)
+
+    def pause_action(self, action: Gio.SimpleAction, parameter: Any | None = None) -> None:
+        """Pause playback"""
+        self.play_action.set_active(False)
 
     def play(self, action: Gtk.ToggleButton) -> None:
         if action.get_active():
@@ -574,14 +580,6 @@ class gTranscribe(Adw.Application):
             # For Return key, also insert newline; for F8, just the timestamp
             if keyname == 'Return':
                 self.text_buffer.insert_at_cursor('\n')
-            return True  # Consume the event
-        # handling for yellow foot switch "science" from cleware
-        if keyname == 'F9':
-            if self.slider.is_sensitive():
-                self.play_action.activate()
-            return True  # Consume the event
-        elif keyname == 'F4':
-            self.play_action.set_active(False)
             return True  # Consume the event
         return False  # Let other keys propagate
 
