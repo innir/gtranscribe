@@ -42,9 +42,9 @@ install_subdir('ui',
   install_dir: pkgdatadir
 )
 
-# Install icon files
-install_subdir('icons',
-  install_dir: pkgdatadir
+# Install icon file
+install_data('gtranscribe.svg',
+  install_dir: datadir / 'icons/hicolor/scalable/apps'
 )
 
 # Man page
