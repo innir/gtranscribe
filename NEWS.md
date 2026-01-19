@@ -1,3 +1,30 @@
+gTranscribe 0.21 Release Notes
+=============================
+
+Bug fixes
+---------
+
+  * Get rid of bare 'except's.
+    [[3700b4d](https://github.com/innir/gtranscribe/commit/3700b4d)]
+
+  * Add missing import (needed for type annotation).
+    [[60f1a27](https://github.com/innir/gtranscribe/commit/60f1a27)]
+
+
+Maintenance
+-----------
+
+  * Move keyboard shortcuts F4/F9 out of on_text_insert().
+    [[2c964ec](https://github.com/innir/gtranscribe/commit/2c964ec)]
+
+  * Remove mesonpy build option and fix project name.
+    [[6c6ccb9](https://github.com/innir/gtranscribe/commit/6c6ccb9)]
+
+  * Update appdata.xml.
+    [[dcf395f](https://github.com/innir/gtranscribe/commit/dcf395f)]
+
+
+
 gTranscribe 0.20 Release Notes
 =============================
 
