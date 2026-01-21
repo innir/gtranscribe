@@ -1,3 +1,14 @@
+gTranscribe 0.21.1 Release Notes
+=============================
+
+Bug fixes
+---------
+
+  * Install icon in correct directory.
+    [[461d2d0](https://github.com/innir/gtranscribe/commit/461d2d0)]
+
+
+
 gTranscribe 0.21 Release Notes
 =============================
 

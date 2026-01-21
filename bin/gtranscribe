@@ -224,7 +224,7 @@ class gTranscribe(Adw.Application):
     def about(self, action: Gio.SimpleAction, parameter: Any | None) -> None:
         about_dialog = Adw.AboutDialog()
         about_dialog.set_application_name("gTranscribe")
-        about_dialog.set_version("0.21")
+        about_dialog.set_version("0.21.1")
         about_dialog.set_copyright("\u00A9 2013-2026 Philip Rinn\n"
                                    "\u00A9 2010 Frederik Elwert")
         about_dialog.set_comments(_("gTranscribe is a software focused "

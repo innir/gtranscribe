@@ -32,6 +32,7 @@
     <binary>gtranscribe</binary>
   </provides>
   <releases>
+    <release version="0.21.1" date="2026-01-21" />
     <release version="0.21" date="2026-01-19" />
     <release version="0.20" date="2026-01-18" />
     <release version="0.11" date="2023-01-05" />
