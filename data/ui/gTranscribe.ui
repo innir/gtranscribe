@@ -17,13 +17,6 @@
     <property name="upper">1.5</property>
     <property name="value">1.0</property>
   </object>
-  <object class="GtkAdjustment" id="adjustment_jump">
-    <property name="lower">0</property>
-    <property name="page-increment">10</property>
-    <property name="step-increment">10</property>
-    <property name="upper">5000</property>
-    <property name="value">1000</property>
-  </object>
   <menu id="main_menu">
     <item>
       <attribute name="action">app.open</attribute>
@@ -36,6 +29,10 @@
     <item>
       <attribute name="action">app.save</attribute>
       <attribute name="label" translatable="yes">Save</attribute>
+    </item>
+    <item>
+      <attribute name="action">app.preferences</attribute>
+      <attribute name="label" translatable="yes">Preferences</attribute>
     </item>
     <item>
       <attribute name="action">app.shortcuts</attribute>
@@ -148,31 +145,6 @@
                         <property name="value-pos">right</property>
                         <property name="width-request">100</property>
                         <property name="valign">center</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkBox">
-                    <property name="spacing">6</property>
-                    <property name="valign">center</property>
-                    <child>
-                      <object class="GtkLabel" id="label_jump">
-                        <property name="label" translatable="yes">Resume interval:</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSpinButton" id="spinbutton_jump">
-                        <property name="adjustment">adjustment_jump</property>
-                        <property name="climb-rate">10.0</property>
-                        <property name="numeric">True</property>
-                        <property name="tooltip-text" translatable="yes">Change the time to jump back on resume in ms</property>
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="label_ms">
-                        <property name="label" translatable="yes">ms</property>
                       </object>
                     </child>
                   </object>

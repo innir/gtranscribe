@@ -42,6 +42,12 @@ install_subdir('ui',
   install_dir: pkgdatadir
 )
 
+# Install and compile GSettings schema
+gnome.compile_schemas(depend_files: 'org.innir.gtranscribe.gschema.xml')
+install_data('org.innir.gtranscribe.gschema.xml',
+  install_dir: datadir / 'glib-2.0/schemas'
+)
+
 # Install icon file
 install_data('gtranscribe.svg',
   install_dir: datadir / 'icons/hicolor/scalable/apps'

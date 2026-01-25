@@ -83,9 +83,14 @@ class gTranscribe(Adw.Application):
 
         self.position: int = 0
 
-        # TODO: Make these configurable
-        self.jump_back_interval: datetime.time | duration = datetime.time(second=1)
-        self.seek_interval: datetime.time | duration = datetime.time(second=1)
+        # Initialize GSettings
+        self.settings = Gio.Settings.new('org.innir.gtranscribe')
+        
+        # Load intervals from settings (stored in milliseconds)
+        jump_back_ms = self.settings.get_int('jump-back-interval')
+        seek_ms = self.settings.get_int('seek-interval')
+        self.jump_back_interval: duration = ns_to_time(jump_back_ms * 1000000)
+        self.seek_interval: duration = ns_to_time(seek_ms * 1000000)
 
         # Initialize database for meta data
         MetaData.init_db(self)
@@ -115,6 +120,7 @@ class gTranscribe(Adw.Application):
         self.create_action("open", self.open, ("<primary>o",))
         self.create_action("open_text", self.open_text, None)
         self.create_action("save", self.save_text, ("<primary>s",))
+        self.create_action("preferences", self.show_preferences, ("<primary>comma",))
         self.create_action("shortcuts", self.show_shortcuts, ("<primary>question",))
         self.create_action("about", self.about, None)
         self.create_action("toggle_play", self.toggle_play_action, ("<primary>space", "F9"))
@@ -141,11 +147,6 @@ class gTranscribe(Adw.Application):
         key_event = Gtk.EventControllerKey.new()
         key_event.connect("key-pressed", self.on_text_insert)
         self.text_view.add_controller(key_event)
-
-        spinbutton_jump = builder.get_object("spinbutton_jump")
-        spinbutton_jump.set_value(time_to_ns(self.jump_back_interval) /
-                                  1000000)
-        spinbutton_jump.connect("value-changed", self.on_jump_value_changed)
 
         self.rewind_button = builder.get_object('button_seek_back')
         self.rewind_button.set_sensitive(False)
@@ -233,6 +234,38 @@ class gTranscribe(Adw.Application):
         about_dialog.set_developer_name("Philip Rinn")
         about_dialog.set_license_type(Gtk.License(Gtk.License.GPL_3_0))
         about_dialog.present()
+
+    # pylint: disable=unused-argument
+    def show_preferences(self, action: Gio.SimpleAction, parameter: Any | None) -> None:
+        preferences_ui = get_data_file(PROJECT_ROOT_DIRECTORY, 'ui', 'preferences.ui')
+        builder = Gtk.Builder.new_from_file(preferences_ui)
+        preferences_dialog = builder.get_object('preferences_dialog')
+        
+        # Get the spin rows
+        jump_back_row = builder.get_object('jump_back_row')
+        seek_interval_row = builder.get_object('seek_interval_row')
+        
+        # Bind settings to the spin rows
+        self.settings.bind('jump-back-interval', jump_back_row, 'value',
+                          Gio.SettingsBindFlags.DEFAULT)
+        self.settings.bind('seek-interval', seek_interval_row, 'value',
+                          Gio.SettingsBindFlags.DEFAULT)
+        
+        # Connect to settings changes to update internal values
+        self.settings.connect('changed::jump-back-interval', self.on_jump_back_interval_changed)
+        self.settings.connect('changed::seek-interval', self.on_seek_interval_changed)
+        
+        preferences_dialog.present(self.window)
+
+    def on_jump_back_interval_changed(self, settings: Gio.Settings, key: str) -> None:
+        jump_back_ms = settings.get_int(key)
+        self.jump_back_interval = ns_to_time(jump_back_ms * 1000000)
+        logger.debug('Jump back interval changed to %d ms', jump_back_ms)
+
+    def on_seek_interval_changed(self, settings: Gio.Settings, key: str) -> None:
+        seek_ms = settings.get_int(key)
+        self.seek_interval = ns_to_time(seek_ms * 1000000)
+        logger.debug('Seek interval changed to %d ms', seek_ms)
 
     # pylint: disable=unused-argument
     def show_shortcuts(self, action: Gio.SimpleAction, parameter: Any | None) -> None:
@@ -478,9 +511,6 @@ class gTranscribe(Adw.Application):
             fileinfo.speed = self.player.rate
         if self.mpris is not None:
             self.mpris.remove_from_connection()
-
-    def on_jump_value_changed(self, range: Gtk.SpinButton) -> None:
-        self.jump_back_interval = ns_to_time(range.get_value_as_int() * 1000000)
 
     # pylint: disable=unused-argument
     def open_text(self, action: Gio.SimpleAction, parameter: Any | None) -> None:

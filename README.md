@@ -27,6 +27,7 @@ Audio player designed to make the transcription of interviews and other sources 
 - Gettext tools for translations (`gettext`)
 - Desktop file utilities (`desktop-file-utils`)
 - GTK icon cache tool (`gtk-update-icon-cache`)
+- GLib schema compiler (`libglib2.0-bin`)
 - (Optional) AppStream CLI for appdata validation (`appstream`)
 
 ### Recommended

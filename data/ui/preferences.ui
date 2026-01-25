@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<interface domain="gTranscribe">
+  <requires lib="gtk" version="4.8"/>
+  <requires lib="libadwaita" version="1.7"/>
+  <object class="AdwPreferencesDialog" id="preferences_dialog">
+    <property name="title" translatable="yes">Preferences</property>
+    <property name="search-enabled">False</property>
+    <child>
+      <object class="AdwPreferencesPage">
+        <property name="icon-name">preferences-system-symbolic</property>
+        <property name="title" translatable="yes">General</property>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Playback</property>
+            <child>
+              <object class="AdwSpinRow" id="jump_back_row">
+                <property name="title" translatable="yes">Jump Back on Pause</property>
+                <property name="subtitle" translatable="yes">How far to rewind when pausing playback (milliseconds)</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">10000</property>
+                    <property name="step-increment">100</property>
+                    <property name="page-increment">1000</property>
+                    <property name="value">1000</property>
+                  </object>
+                </property>
+                <property name="digits">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwSpinRow" id="seek_interval_row">
+                <property name="title" translatable="yes">Seek Interval</property>
+                <property name="subtitle" translatable="yes">Time to skip forward/backward with seek buttons (milliseconds)</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">10000</property>
+                    <property name="step-increment">100</property>
+                    <property name="page-increment">1000</property>
+                    <property name="value">1000</property>
+                  </object>
+                </property>
+                <property name="digits">0</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

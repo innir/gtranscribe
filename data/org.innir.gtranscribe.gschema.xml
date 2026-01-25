@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.innir.gtranscribe" path="/org/innir/gtranscribe/">
+    <key name="jump-back-interval" type="i">
+      <default>1000</default>
+      <summary>Jump back on pause interval</summary>
+      <description>How far to rewind when pausing playback, in milliseconds</description>
+      <range min="0" max="10000"/>
+    </key>
+    <key name="seek-interval" type="i">
+      <default>1000</default>
+      <summary>Seek interval</summary>
+      <description>Time to skip forward/backward with seek buttons, in milliseconds</description>
+      <range min="0" max="10000"/>
+    </key>
+  </schema>
+</schemalist>
