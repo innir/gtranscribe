@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: gTranscribe 0.11\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-14 18:23+0100\n"
-"PO-Revision-Date: 2026-01-14 18:25+0100\n"
+"Project-Id-Version: gTranscribe 0.22\n"
+"Report-Msgid-Bugs-To: rinni@inventati.org\n"
+"POT-Creation-Date: 2026-01-25 17:03+0100\n"
+"PO-Revision-Date: 2026-01-25 17:03+0100\n"
 "Last-Translator: Philip Rinn <rinni@inventati.org>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -14,124 +14,159 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: bin/gtranscribe:223
+#: bin/gtranscribe:231
 msgid ""
 "gTranscribe is a software focused on easy transcription of spoken words."
 msgstr ""
 "gTranscribe ist ein Programm, das auf einfaches Transkribieren von "
 "gesprochenen Wörtern fokussiert ist."
 
-#: bin/gtranscribe:240 data/ui/shortcuts.ui:14
+#: bin/gtranscribe:280
 msgid "Open Audio File"
 msgstr "Audio-Datei öffnen"
 
-#: bin/gtranscribe:240
+#: bin/gtranscribe:280
 msgid "All Audio Files"
 msgstr "Alle Audio-Dateien"
 
-#: bin/gtranscribe:477
+#: bin/gtranscribe:522
 msgid "Open Text File"
 msgstr "Text-Datei öffnen"
 
-#: bin/gtranscribe:478
+#: bin/gtranscribe:523
 msgid "Plain Text Files"
 msgstr "Einfache Textdateien"
 
-#: bin/gtranscribe:592
+#: bin/gtranscribe:628
 msgid "Show debug messages"
 msgstr "Diagnosemeldungen anzeigen"
 
-#: bin/gtranscribe:593
+#: bin/gtranscribe:629
 msgid "Audio file to load"
 msgstr "Zu ladende Audio-Datei"
 
-#: gtranscribe/helpers.py:148
+#: gtranscribe/helpers.py:149
 msgid "Save Text File"
 msgstr "Text-Datei speichern"
 
-#: data/ui/gTranscribe.ui:30 data/ui/gTranscribe.ui:60
+#: data/ui/gTranscribe.ui:23 data/ui/gTranscribe.ui:57
 msgid "Open"
 msgstr "Öffnen"
 
-#: data/ui/gTranscribe.ui:34
+#: data/ui/gTranscribe.ui:27
 msgid "Open Text"
 msgstr "Öffne Text"
 
-#: data/ui/gTranscribe.ui:38 data/ui/gTranscribe.ui:73
+#: data/ui/gTranscribe.ui:31 data/ui/gTranscribe.ui:70
 msgid "Save"
 msgstr "Speichern"
 
-#: data/ui/gTranscribe.ui:42
-msgid "Keyboard Shortcuts"
-msgstr "Tastenkombinationen"
+#: data/ui/gTranscribe.ui:35 data/ui/preferences.ui:6 data/ui/shortcuts.ui:14
+msgid "Preferences"
+msgstr "Einstellungen"
 
-#: data/ui/gTranscribe.ui:46
+#: data/ui/gTranscribe.ui:39
+msgid "Keyboard Shortcuts"
+msgstr "Tastenkürzel"
+
+#: data/ui/gTranscribe.ui:43
 msgid "About"
 msgstr "Info"
 
-#: data/ui/gTranscribe.ui:139
+#: data/ui/gTranscribe.ui:136
 msgid "Speed:"
 msgstr "Geschwindigkeit:"
 
-#: data/ui/gTranscribe.ui:147
+#: data/ui/gTranscribe.ui:144
 msgid "Change playback speed"
 msgstr "Wiedergabegeschwindigkeit ändern"
 
-#: data/ui/gTranscribe.ui:161
-msgid "Resume interval:"
-msgstr "Rücksprung-Intervall:"
+#: data/ui/preferences.ui:11 data/ui/shortcuts.ui:11
+msgid "General"
+msgstr "Allgemein"
 
-#: data/ui/gTranscribe.ui:169
-msgid "Change the time to jump back on resume in ms"
-msgstr "Zeit die nach dem Fortsetzen zurück gesprungen wird in ms"
+#: data/ui/preferences.ui:14
+msgid "Playback"
+msgstr "Wiedergabe"
 
-#: data/ui/gTranscribe.ui:175
-msgid "ms"
-msgstr "ms"
+#: data/ui/preferences.ui:17
+msgid "Jump Back on Pause"
+msgstr "Rücksprung beim Pausieren"
 
-#: data/ui/shortcuts.ui:11
+#: data/ui/preferences.ui:18
+msgid "How far to rewind when pausing playback (milliseconds)"
+msgstr ""
+"Wie weit zurückgespult werden soll beim Pausieren der Wiedergabe "
+"(Millisekunden)"
+
+#: data/ui/preferences.ui:33
+msgid "Seek Interval"
+msgstr "Sprungintervall"
+
+#: data/ui/preferences.ui:34
+msgid "Time to skip forward/backward with seek buttons (milliseconds)"
+msgstr "Zeit zum Vor-/Zurückspringen mit den Sprungtasten (Millisekunden)"
+
+#: data/ui/shortcuts.ui:20
+msgid "Shortcuts"
+msgstr "Tastenkürzel"
+
+#: data/ui/shortcuts.ui:26
+msgid "Undo"
+msgstr "Rückgängig"
+
+#: data/ui/shortcuts.ui:32
+msgid "Redo"
+msgstr "Wiederholen"
+
+#: data/ui/shortcuts.ui:40
 msgid "File Operations"
 msgstr "Dateioperationen"
 
-#: data/ui/shortcuts.ui:20
+#: data/ui/shortcuts.ui:49
 msgid "Save Text"
 msgstr "Text speichern"
 
-#: data/ui/shortcuts.ui:28
+#: data/ui/shortcuts.ui:57
 msgid "Playback Control"
 msgstr "Wiedergabesteuerung"
 
-#: data/ui/shortcuts.ui:31
+#: data/ui/shortcuts.ui:60
 msgid "Play/Pause"
 msgstr "Wiedergabe/Pause"
 
-#: data/ui/shortcuts.ui:37
+#: data/ui/shortcuts.ui:66
 msgid "Pause"
 msgstr "Pausieren"
 
-#: data/ui/shortcuts.ui:45
+#: data/ui/shortcuts.ui:72
+msgid "Rewind"
+msgstr "Zurückspulen"
+
+#: data/ui/shortcuts.ui:78
+msgid "Forward"
+msgstr "Vorspulen"
+
+#: data/ui/shortcuts.ui:84
+msgid "Faster"
+msgstr "Schneller"
+
+#: data/ui/shortcuts.ui:90
+msgid "Slower"
+msgstr "Langsamer"
+
+#: data/ui/shortcuts.ui:98
 msgid "Transcription"
 msgstr "Transkription"
 
-#: data/ui/shortcuts.ui:48
+#: data/ui/shortcuts.ui:101
 msgid "Insert Timestamp"
 msgstr "Zeitstempel einfügen"
 
-#: data/ui/shortcuts.ui:54
+#: data/ui/shortcuts.ui:107
 msgid "Insert Timestamp and New Line"
 msgstr "Zeitstempel und neue Zeile einfügen"
 
-#~ msgid "Play"
-#~ msgstr "Wiedergabe"
-
-#~ msgid "_File"
-#~ msgstr "_Datei"
-
-#~ msgid "Slower"
-#~ msgstr "Langsamer"
-
-#~ msgid "Faster"
-#~ msgstr "Schneller"
-
-#~ msgid "_Help"
-#~ msgstr "_Hilfe"
+#: data/ui/shortcuts.ui:113
+msgid "Jump to Timestamp"
+msgstr "Zu Zeitstempel springen"
