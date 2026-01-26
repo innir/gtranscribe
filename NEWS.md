@@ -1,3 +1,24 @@
+gTranscribe 0.22.0 Release Notes
+=============================
+
+New features
+------------
+
+  * Make resume and seek intervals configurable.
+    [[058c470](https://github.com/innir/gtranscribe/commit/058c470)]
+
+  * Add more general keyboard shortcuts.
+    [[79d959a](https://github.com/innir/gtranscribe/commit/79d959a)]
+
+
+Maintenance
+-----------
+
+  * Update German translation.
+    [[37aa00d](https://github.com/innir/gtranscribe/commit/37aa00d)]
+
+
+
 gTranscribe 0.21.1 Release Notes
 =============================
 
